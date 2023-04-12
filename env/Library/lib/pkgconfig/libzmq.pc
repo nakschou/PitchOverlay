@@ -1,0 +1,12 @@
+prefix=C:/Users/Justin/Desktop/OpenCV2023/env/Library
+exec_prefix=C:/Users/Justin/Desktop/OpenCV2023/env/Library
+libdir=C:/Users/Justin/Desktop/OpenCV2023/env/Library/lib
+includedir=C:/Users/Justin/Desktop/OpenCV2023/env/Library/include
+
+Name: libzmq
+Description: 0MQ c++ library
+Version: 4.3.4
+Libs: -L${libdir} -lzmq
+Libs.private: -lstdc++ 
+Requires.private: 
+Cflags: -I${includedir} 
