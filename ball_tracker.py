@@ -5,13 +5,16 @@ from tracker import *
 
 cap = cv.VideoCapture('pitcher_vids/lhp_sl.mp4')
 
+
 while cap.isOpened():
     _, image = cap.read()
+    if image is None:
+        break
     # convert to grayscale
     grayscale = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     grayscale = cv.medianBlur(grayscale, 9)
     edges = cv.Canny(grayscale, 150, 200)
-    # detect lines in the image using hough lines technique
+    # detect circles via hough
     circles = cv.HoughCircles(image=edges, method=cv.HOUGH_GRADIENT, dp=0.3, 
                               minRadius=5, minDist=10, param1=5, param2=10, 
                               maxRadius=10)
