@@ -5,12 +5,10 @@ import numpy as np
 from tracker import *
 import argparse
 
-parser = argparse.ArgumentParser(description='This program shows how to use background subtraction methods provided by \
-                                              OpenCV. You can process both videos and images.')
-parser.add_argument('--input', type=str, help='Path to a video or a \
-sequence of image.', default='pitcher_vids/lhp_sl.mp4')
+parser = argparse.ArgumentParser()
+parser.add_argument('--input', type=str, default='pitcher_vids/lhp_sl.mp4')
 parser.add_argument('--algo', type=str, help='Background subtraction \
-method (KNN, MOG2).', default='MOG2')
+method (KNN, MOG2).', default='KNN')
 args = parser.parse_args()
 if args.algo == 'MOG2':
     backSub = cv.createBackgroundSubtractorMOG2()
@@ -30,7 +28,7 @@ while cap.isOpened():
     
     # detect circles via hough
     circles = cv.HoughCircles(image=fgMask, method=cv.HOUGH_GRADIENT, dp=1, 
-                              minRadius=5, minDist=80, param1=10, param2=10, 
+                              minRadius=5, minDist=80, param1=5, param2=10, 
                               maxRadius=10)
     # iterate over the output lines and draw them
     if circles is not None:
