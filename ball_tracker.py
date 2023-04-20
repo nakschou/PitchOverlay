@@ -1,7 +1,6 @@
 import cv2 as cv
 from matplotlib import pyplot as plt
 import numpy as np
-from tracker import *
 
 cap = cv.VideoCapture('pitcher_vids/lhp_sl.mp4')
 
@@ -15,7 +14,7 @@ while cap.isOpened():
     grayscale = cv.medianBlur(grayscale, 9)
     edges = cv.Canny(grayscale, 150, 200)
     # detect circles via hough
-    circles = cv.HoughCircles(image=edges, method=cv.HOUGH_GRADIENT, dp=0.3, 
+    circles = cv.HoughCircles(image=edges, method=cv.HOUGH_GRADIENT, dp=1, 
                               minRadius=5, minDist=10, param1=5, param2=10, 
                               maxRadius=10)
     # iterate over the output lines and draw them
