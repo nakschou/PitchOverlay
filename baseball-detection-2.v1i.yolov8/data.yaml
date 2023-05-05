@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['baseball']
+
+roboflow:
+  workspace: project
+  project: baseball-detection-2
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/project/baseball-detection-2/dataset/1
