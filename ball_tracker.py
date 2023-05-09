@@ -4,7 +4,6 @@ import numpy as np
 
 cap = cv.VideoCapture('pitcher_vids/lhp_sl.mp4')
 
-
 while cap.isOpened():
     _, image = cap.read()
     if image is None:

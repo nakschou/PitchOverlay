@@ -2,7 +2,6 @@ from __future__ import print_function
 import cv2 as cv
 from matplotlib import pyplot as plt
 import numpy as np
-from tracker import *
 import argparse
 
 parser = argparse.ArgumentParser()
