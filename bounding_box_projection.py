@@ -69,11 +69,32 @@ def create_frame_arr(df, length):
     print(frame_arr)
     return frame_arr
 
+def eliminate_outliers(df):
+    confdf = df[df['confidence'] > 0.5]
+    x_parametric = np.polyfit(confdf['frame'], confdf['x_center'], 2)
+    y_parametric = np.polyfit(confdf['frame'], confdf['y_center'], 2)
+    df['x_dist'] = df.apply(lambda row: dist(row['x_center'], row['frame'], \
+                                                  x_parametric), axis=1)
+    df['y_dist'] = df.apply(lambda row: dist(row['y_center'], row['frame'], \
+                                                    y_parametric), axis=1)
+    df = df[abs(df['x_dist']) < 10]
+    df = df[abs(df['y_dist']) < 10]
+    return df
+
+def dist(var, frame, var_parametric):
+    return var-(var_parametric[0]*frame**2 + var_parametric[1]*frame + \
+              var_parametric[2])
+
+
+
 if __name__ == "__main__":
     df = pd.read_csv('boxes.csv')
     df = add_center(df, 'x1', 'y1', 'x2', 'y2')
     vid_data = read_video_data(path)
     toi = get_toi(vid_data, desired_timeframe, df)
-    #print(df)
-    print(toi)
+    df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
+    df['frame'] = df['frame'] - toi[0]
+    df = eliminate_outliers(df)
+    df['frame'] = df['frame'] + toi[0]
+    print(df)
     #df.to_csv('boxes.csv', index=False)
