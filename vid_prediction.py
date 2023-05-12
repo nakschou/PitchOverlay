@@ -4,8 +4,8 @@ import cv2 as cv
 import pandas as pd
 
 model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid_path = 'pitcher_vids/pitcher (1).mp4'
-boxes_path = 'boxes.csv'
+vid_path = 'pitcher_vids/pitcher (3).mp4'
+boxes_path = 'boxes2.csv'
 
 confidence_ind = 4
 num_extra_elems = 2
