@@ -6,11 +6,13 @@ import os
 path = "pitcher_vids/pitcher (3).mp4"
 boxes_path = 'boxes2.csv'
 out_path = "tracker2.mp4"
+new_boxes_path = 'new_boxes2.csv'
 desired_timeframe = 0.5 #timeframe in seconds
-conf_ind = 7
-size_increment = 3
-confidence_threshold = 0.5
-poly_deg = 2
+conf_ind = 7 #probably shouldn't need to change this
+x_increment = 3 #make bounding box bigger by x_increment pixels
+y_increment = 0 #make bounding box bigger by y_increment pixels
+confidence_threshold = 0.5 #threshold for points used for parametric curve
+poly_deg = 2 #degree of polynomial used for parametric curve
 
 def read_video_data(path):
     """
@@ -115,7 +117,6 @@ def create_frame_arr(df, length):
     prevnum = df.at[0,'frame']
     maxconf_prevnum = df.at[0, 'confidence']
     for i in range(1, df.shape[0]):
-        print(prevnum)
         if df.at[i, 'frame'] != prevnum:
             frame_arr[prevnum] += maxconf_prevnum
             maxconf_prevnum = df.at[i, 'confidence']
@@ -192,8 +193,8 @@ def normalize_boxes(df):
     df['x_size'] = (df['x2'] - df['x1'])
     df['y_size'] = (df['y2'] - df['y1'])
     #sets the new size to be the average size of the boxes + a size increment
-    newxsize = df['x_size'].mean() + size_increment
-    newysize = df['y_size'].mean() + size_increment
+    newxsize = df['x_size'].mean() + x_increment
+    newysize = df['y_size'].mean() + y_increment
     df = df.drop('x_size', axis=1)
     df = df.drop('y_size', axis=1)
     #new parametric equations
@@ -214,7 +215,6 @@ def normalize_boxes(df):
     missing_df = pd.DataFrame.from_dict(missing_rows, orient='index', \
                                         columns=['x1', 'y1', 'x2',\
                                 'y2', 'x_center', 'y_center'])
-    #print(df)
     missing_df.index.name = 'frame'
     missing_df.reset_index(inplace=True)
     df = pd.concat([df, missing_df], ignore_index=True)
@@ -277,14 +277,11 @@ if __name__ == "__main__":
     df = pd.read_csv(boxes_path)
     df = add_center(df)
     vid_data = read_video_data(path)
-    print(df)
     toi = get_toi(vid_data, desired_timeframe, df)
-    print(toi)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df['frame'] = df['frame'] - toi[0]
     df = eliminate_outliers(df)
     df = normalize_boxes(df)
     df['frame'] = df['frame'] + toi[0]
-    #print(df)
     video_with_boxes(df, path, out_path)
-    #df.to_csv('boxes.csv', index=False)
+    df.to_csv(new_boxes_path, index=False)
