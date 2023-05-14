@@ -2,17 +2,40 @@ import pandas as pd
 import cv2 as cv
 import numpy as np
 import os
+import math
 
 path = "pitcher_vids/pitcher (3).mp4"
 boxes_path = 'boxes2.csv'
 out_path = "tracker2.mp4"
 new_boxes_path = 'new_boxes2.csv'
-desired_timeframe = 0.5 #timeframe in seconds
-conf_ind = 7 #probably shouldn't need to change this
-x_increment = 3 #make bounding box bigger by x_increment pixels
-y_increment = 0 #make bounding box bigger by y_increment pixels
-confidence_threshold = 0.5 #threshold for points used for parametric curve
+pitch_velo = 82 #mph
 poly_deg = 2 #degree of polynomial used for parametric curve
+
+def pitch_time_frames(speed):
+    # Convert mph to m/s
+    v0 = speed * 0.44704
+    # Adjust for release angle
+    v0 = v0 * math.cos(math.radians(math.pi/36))
+
+    # Constants
+    c_d = 0.47      # Drag coefficient of a sphere
+    a = 0.004145    # Cross-sectional area of a baseball (m^2)
+    m = 0.145       # Mass of a baseball (kg)
+    rho = 1.225     # Density of air at room temperature (kg/m^3)
+    dist = 18.44 + 1.28 # Distance from pitcher to plate (m)
+    # the weirdo number is to account for the fact that the catcher generally
+    # catches the ball a little bit behind the plate
+
+    # Calculate the drag force
+    f_d = 0.5 * c_d * a * rho * v0**2
+
+    # Calculate the acceleration due to air resistance
+    a_D = f_d / m
+
+    # Calculate the time to reach the plate
+    t = (-v0 + math.sqrt(v0**2 + 2*a_D*dist)) / a_D
+
+    return int(t*60+0.5)
 
 def read_video_data(path):
     """
@@ -49,7 +72,7 @@ def add_center(df):
     df['y_center'] = (df['y1'] + df['y2']) / 2
     return df
 
-def get_toi(vid_data, desired_timeframe, df):
+def get_toi(vid_data, velo, df):
     """
     Gets a "timeframe of interest" (TOI) for each pitch.
 
@@ -59,16 +82,16 @@ def get_toi(vid_data, desired_timeframe, df):
 
     Args:
         vid_data (tuple): (framerate, length) of video.
-        desired_timeframe (float): Desired length of timeframe in seconds.
+        pitch_velo (float): pitch velo in mph
         df (DataFrame): Dataframe containing bounding box data.
     
     Returns:
         tuple: (start, end) of TOI.
     
     Raises:
-        ValueError: If desired_timeframe is longer than the video.
+        ValueError: If toi is longer than the video.
     """
-    window = int(vid_data[0] * desired_timeframe)
+    window = pitch_time_frames(velo)
     if window > vid_data[1]:
         raise ValueError("Desired timeframe is longer than video")
     frame_arr = create_frame_arr(df, vid_data[1])
@@ -140,6 +163,7 @@ def eliminate_outliers(df):
     Returns:
         DataFrame: Dataframe with outliers removed.
     """
+    confidence_threshold = 0.5 #threshold for points used for parametric curve
     confdf = df[df['confidence'] > confidence_threshold]
     #parametricizes the curve of the ball
     x_parametric = np.polyfit(confdf['frame'], confdf['x_center'], poly_deg)
@@ -188,6 +212,8 @@ def normalize_boxes(df):
     Returns:
         DataFrame: Dataframe with normalized boxes.
     """
+    x_increment = 3 #make bounding box bigger by x_increment pixels
+    y_increment = 0 #make bounding box bigger by y_increment pixels
     #gets the sizes of the boxes
     df['x_size'] = (df['x2'] - df['x1'])
     df['y_size'] = (df['y2'] - df['y1'])
@@ -252,10 +278,10 @@ def video_with_boxes(df, vid_path, out_path):
         if ret == True:
             if i in df['frame'].values:
                 row = df.loc[df['frame'] == i]
-                x1 = int(row['x1'])
-                y1 = int(row['y1'])
-                x2 = int(row['x2'])
-                y2 = int(row['y2'])
+                x1 = int(row['x1'].iloc[0])
+                y1 = int(row['y1'].iloc[0])
+                x2 = int(row['x2'].iloc[0])
+                y2 = int(row['y2'].iloc[0])
                 cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             # Write the modified frame to the output video
             out.write(frame) 
@@ -274,7 +300,7 @@ if __name__ == "__main__":
     df = pd.read_csv(boxes_path)
     df = add_center(df)
     vid_data = read_video_data(path)
-    toi = get_toi(vid_data, desired_timeframe, df)
+    toi = get_toi(vid_data, pitch_velo, df)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df['frame'] = df['frame'] - toi[0]
     df = eliminate_outliers(df)

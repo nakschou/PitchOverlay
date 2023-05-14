@@ -116,10 +116,9 @@ def get_mask(dct, vid_path, out_path):
                 center = (x, y)
                 radius = avg_radius
                 color = (255, 255, 255)
-                thickness = -1
 
                 # Draw the defined circle on the mask
-                cv.circle(mask, center, radius, color, thickness)
+                cv.circle(mask, center, radius, color, -1)
 
                 # Apply the mask to the original image
                 result = cv.bitwise_and(frame, mask)
