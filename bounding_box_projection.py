@@ -171,8 +171,7 @@ def dist(var, frame, var_parametric):
     Returns:
         float: Distance between point and parametric curve.
     """
-    return var-(var_parametric[0]*frame**2 + var_parametric[1]*frame + \
-              var_parametric[2])
+    return var-np.polyval(var_parametric, frame)
 
 def normalize_boxes(df):
     """
@@ -208,10 +207,8 @@ def normalize_boxes(df):
     missing_rows = {}
     for i in range(len(framearr)):
         if(framearr[i] == 0):
-            missing_rows[i] = [0, 0, 0, 0, x_parametric[0]*i**2 + \
-                            x_parametric[1]*i + x_parametric[2], 
-                            y_parametric[0]*i**2 + y_parametric[1]*i + \
-                            y_parametric[2]]
+            missing_rows[i] = [0, 0, 0, 0, np.polyval(x_parametric, i),
+                               np.polyval(y_parametric, i)]
     missing_df = pd.DataFrame.from_dict(missing_rows, orient='index', \
                                         columns=['x1', 'y1', 'x2',\
                                 'y2', 'x_center', 'y_center'])
