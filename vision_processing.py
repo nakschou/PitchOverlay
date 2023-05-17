@@ -8,7 +8,7 @@ boxes_path = 'new_boxes2.csv'
 out_path = "tracker2processed.mp4"
 poly_deg = 2
 
-def get_circles(df, vid_path):
+def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
     """
     Creates a video with circles around the detected balls.
 
@@ -17,7 +17,7 @@ def get_circles(df, vid_path):
         vid_path (str): Path to video.
     
     Returns:
-        None
+        dict: Dictionary containing circle data.
     
     Raises:
         ValueError: If vid_path is not a valid path.
@@ -81,7 +81,7 @@ def get_circles(df, vid_path):
     cv.destroyAllWindows()
     return circles_dct
 
-def get_mask(dct, vid_path, out_path):
+def get_mask(dct: dict, vid_path: str, out_path: str) -> None:
     """
     Creates a video with circles around the detected balls.
 
@@ -132,11 +132,21 @@ def get_mask(dct, vid_path, out_path):
     out.release()
     cv.destroyAllWindows()
 
+def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
+    """
+    Runs the vision processing pipeline.
+
+    Args:
+        boxes_path (str): Path to boxes csv.
+        vid_path (str): Path to video.
+        out_path (str): Path to save video.
+    
+    Returns:
+        None
+    """
+    df = pd.read_csv(boxes_path)
+    dct = get_circles(df, vid_path)
+    get_mask(dct, vid_path, out_path)
 
 if __name__ == "__main__":
-    df = pd.read_csv(boxes_path)
-    dct = get_circles(df, path)
-    get_mask(dct, path, out_path)
-    #df2 = normalize_circles(df, dct)
-    #print(df2)
-    #save_vid(df2, path, out_path)
+    vp_runner(boxes_path, path, out_path)

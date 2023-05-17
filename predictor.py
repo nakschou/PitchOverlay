@@ -8,9 +8,9 @@ model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
 vid_path = 'pitcher_vids/pitcher (3).mp4'
 boxes_path = 'boxes2.csv'
 
-def get_boxes(model, vid_path):
+def get_boxes(model, vid_path: str) -> dict:
     """
-    Gets the boxes from the video and returns a dictionary of boxes
+    Gets the bounding boxes from the video and returns a dictionary of boxes
     
     Args:
         model: YOLO model
@@ -58,7 +58,7 @@ def get_boxes(model, vid_path):
     cv.destroyAllWindows()
     return boxes_dct
 
-def convert_boxes_df(dct):
+def convert_boxes_df(dct: dict) -> pd.DataFrame():
     """
     Converts the boxes dictionary to a dataframe
 
@@ -79,10 +79,24 @@ def convert_boxes_df(dct):
     df['box_num'] = df['box_num'].astype(int)
     return df
 
-def predictor_runner(model_path, vid_path, boxes_path):
+def predictor_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
+    """
+    Runner for the predictor code.
+
+    Sets a YOLO model, tracks the video, gets the boxes, converts the boxes to
+    a dataframe, and saves the dataframe to a csv.
+
+    Args:
+        model_path (str): Path to model
+        vid_path (str): Path to video
+        boxes_path (str): Path to save boxes to
+    
+    Returns:
+        None
+    """
     model = YOLO(model_path)
     # Tracks the video and saves it TODO: eliminate need for this
-    model.track(vid_path, save=True, conf=0.03)
+    #model.track(vid_path, save=True, conf=0.03)
     # Gets the boxes in a format unfit for a dataframe
     boxes_dct = get_boxes(model, vid_path)
     # Converts the boxes to fittable format and writes to dataframe

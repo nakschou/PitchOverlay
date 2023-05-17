@@ -11,7 +11,7 @@ new_boxes_path = 'new_boxes2.csv'
 pitch_velo = 82 #mph
 poly_deg = 2 #degree of polynomial used for parametric curve
 
-def pitch_time_frames(speed):
+def pitch_time_frames(speed: int) -> int:
     # Convert mph to m/s
     v0 = speed * 0.44704
     # Adjust for release angle
@@ -37,7 +37,7 @@ def pitch_time_frames(speed):
 
     return int(t*60+0.5)
 
-def read_video_data(path):
+def read_video_data(path: str) -> tuple:
     """
     Gets the framerate and length of a video.
 
@@ -58,7 +58,7 @@ def read_video_data(path):
     cap.release()
     return (framerate, length)
 
-def add_center(df):
+def add_center(df: pd.DataFrame) -> pd.DataFrame:
     """
     Adds the x_center and y_center columns to a dataframe.
 
@@ -72,7 +72,8 @@ def add_center(df):
     df['y_center'] = (df['y1'] + df['y2']) / 2
     return df
 
-def get_toi(vid_data, velo, df):
+def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame) -> \
+    tuple:
     """
     Gets a "timeframe of interest" (TOI) for each pitch.
 
@@ -120,7 +121,7 @@ def get_toi(vid_data, velo, df):
     else:
         return (max_detections_start, max_detections_start + window)
      
-def create_frame_arr(df, length):
+def create_frame_arr(df: pd.DataFrame, length: int) -> np.ndarray:
     """
     Helper function for get_toi. 
     
@@ -149,7 +150,7 @@ def create_frame_arr(df, length):
             maxconf_prevnum = df.at[i, 'confidence']
     return frame_arr
 
-def eliminate_outliers(df):
+def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """
     Eliminates the outliers from the dataframe.
 
@@ -180,7 +181,7 @@ def eliminate_outliers(df):
     df = df.drop('confidence', axis=1)
     return df
 
-def dist(var, frame, var_parametric):
+def dist(var: float, frame: int, var_parametric: np.ndarray) -> float:
     """
     Helper function for eliminate_outliers.
 
@@ -197,7 +198,7 @@ def dist(var, frame, var_parametric):
     """
     return var-np.polyval(var_parametric, frame)
 
-def normalize_boxes(df):
+def normalize_boxes(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalizes the bounding boxes in the dataframe.
 
@@ -249,7 +250,7 @@ def normalize_boxes(df):
     return df
 
 
-def video_with_boxes(df, vid_path, out_path):
+def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     """
     Creates a video with bounding boxes around the ball.
 
@@ -295,8 +296,24 @@ def video_with_boxes(df, vid_path, out_path):
     out.release() 
     cv.destroyAllWindows()
 
+def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int, 
+               new_boxes_path: str) -> None:
+    """
+    Runner for the bounding box projection.
 
-if __name__ == "__main__":
+    Adds the center to the csv, finds the timeframe of interest, eliminates
+    outliers, normalizes the boxes, and creates a video with the boxes. It then
+    writes the new boxes to a csv.
+
+    Args:
+        boxes_path (str): Path to csv containing bounding box data.
+        vid_path (str): Path to video.
+        pitch_velo (int): Pitch velocity in mph.
+        new_boxes_path (str): Path to save new boxes to.
+    
+    Returns:
+        None
+    """
     df = pd.read_csv(boxes_path)
     df = add_center(df)
     vid_data = read_video_data(path)
@@ -308,3 +325,7 @@ if __name__ == "__main__":
     df['frame'] = df['frame'] + toi[0]
     video_with_boxes(df, path, out_path)
     df.to_csv(new_boxes_path, index=False)
+    
+if __name__ == "__main__":
+    bbp_runner(boxes_path, path, pitch_velo, new_boxes_path)
+    

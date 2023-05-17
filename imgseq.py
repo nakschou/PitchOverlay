@@ -4,7 +4,7 @@ import os
 vid_path = 'pitcher_vids/cut up/cutup.mp4'
 seq_path = 'sequence/'
 
-def create_sequence(vid_path, seq_path):
+def create_sequence(vid_path: str, seq_path: str) -> None:
     """
     Creates a sequence of images from a video
     
