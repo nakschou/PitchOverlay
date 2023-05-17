@@ -5,8 +5,9 @@ import pandas as pd
 import os
 
 model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid_path = 'pitcher_vids/pitcher (3).mp4'
-boxes_path = 'boxes2.csv'
+vid_path = 'pitcher_vids/pitcher (4).mp4'
+boxes_path = 'csvs/boxes1.csv'
+out_path = "processed_vids/tracker1.mp4"
 
 def get_boxes(model, vid_path: str) -> dict:
     """
@@ -96,7 +97,7 @@ def predictor_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
     """
     model = YOLO(model_path)
     # Tracks the video and saves it TODO: eliminate need for this
-    #model.track(vid_path, save=True, conf=0.03)
+    model.track(vid_path, save=True, conf=0.03)
     # Gets the boxes in a format unfit for a dataframe
     boxes_dct = get_boxes(model, vid_path)
     # Converts the boxes to fittable format and writes to dataframe

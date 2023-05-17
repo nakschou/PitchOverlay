@@ -5,11 +5,11 @@ import pandas as pd
 from ultralytics import YOLO
 
 model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid1_path = "pitcher_vids/pitcher (3).mp4"
-pitch1_velo = 82
-boxes_path = "boxes2.csv"
+vid1_path = "pitcher_vids/pitcher (4).mp4"
+pitch1_velo = 98
+boxes_path = "boxes4.csv"
 poly_deg = 2
-out_path = "processed.mp4"
+out_path = "processed4.mp4"
 
 if __name__ == "__main__":
     # Loads the model, change pathing based on what you need
@@ -27,10 +27,8 @@ if __name__ == "__main__":
     #shrinks the dataframe to the time of interest
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     #adjustments to make life easier
-    df['frame'] = df['frame'] - toi[0]
     df = bbp.eliminate_outliers(df)
-    df = bbp.normalize_boxes(df)
-    df['frame'] = df['frame'] + toi[0]
+    df = bbp.normalize_boxes(df, toi)
     df.to_csv(boxes_path)
     dct = vp.get_circles(df, vid1_path)
     vp.get_mask(dct, vid1_path, out_path)

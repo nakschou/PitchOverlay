@@ -4,12 +4,12 @@ import numpy as np
 import os
 import math
 
-path = "pitcher_vids/pitcher (3).mp4"
-boxes_path = 'boxes2.csv'
-out_path = "tracker2.mp4"
-new_boxes_path = 'new_boxes2.csv'
-pitch_velo = 82 #mph
-poly_deg = 2 #degree of polynomial used for parametric curve
+path = "pitcher_vids/pitcher (4).mp4"
+boxes_path = 'csvs/boxes1.csv'
+out_path = "processed_vids/tracker1.mp4"
+new_boxes_path = 'csvs/new_boxes1.csv'
+pitch_velo = 98 #mph
+poly_deg = 3 #degree of polynomial used for parametric curve
 
 def pitch_time_frames(speed: int) -> int:
     # Convert mph to m/s
@@ -54,6 +54,7 @@ def read_video_data(path: str) -> tuple:
         raise ValueError("Invalid path")
     cap = cv.VideoCapture(path)
     length = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    #print("length: ", length)
     framerate = int(cap.get(cv.CAP_PROP_FPS))
     cap.release()
     return (framerate, length)
@@ -101,26 +102,16 @@ def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame) -> \
     for i in range(window):
         curr_detections += frame_arr[i]
     max_detections = curr_detections
-    max_detections_start = 0
-    max_equal_detections = 0
+    max_detections_i = 0
     #finds the maximum number of detections in a window, if there are multiple
-    #windows with the same number of detections, it takes the middle one    
+    #windows with the same number of detections, it takes the middle one  
     for i in range(1, vid_data[1]-window):
         curr_detections -= frame_arr[i-1]
         curr_detections += frame_arr[i+window-1]
-        if curr_detections > max_detections:
+        if curr_detections >= max_detections:
             max_detections = curr_detections
-            max_detections_start = i
-            max_equal_detections = 0
-        elif curr_detections == max_detections:
-            max_equal_detections += 1
-    #print(max_detections_start)
-    if max_equal_detections > 0:
-        start = (max_detections_start*2 + max_equal_detections) // 2
-        return (start, start + window)
-    else:
-        return (max_detections_start, max_detections_start + window)
-     
+            max_detections_i = i
+    return (max_detections_i, max_detections_i + window)
 def create_frame_arr(df: pd.DataFrame, length: int) -> np.ndarray:
     """
     Helper function for get_toi. 
@@ -179,6 +170,7 @@ def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop('x_dist', axis=1)
     df = df.drop('y_dist', axis=1)
     df = df.drop('confidence', axis=1)
+    df = df.drop('box_num', axis = 1)
     return df
 
 def dist(var: float, frame: int, var_parametric: np.ndarray) -> float:
@@ -198,7 +190,7 @@ def dist(var: float, frame: int, var_parametric: np.ndarray) -> float:
     """
     return var-np.polyval(var_parametric, frame)
 
-def normalize_boxes(df: pd.DataFrame) -> pd.DataFrame:
+def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     """
     Normalizes the bounding boxes in the dataframe.
 
@@ -209,6 +201,7 @@ def normalize_boxes(df: pd.DataFrame) -> pd.DataFrame:
 
     Args:
         df (DataFrame): Dataframe containing bounding box data.
+        toi (tuple): (start, end) of timeframe of interest.
     
     Returns:
         DataFrame: Dataframe with normalized boxes.
@@ -227,15 +220,15 @@ def normalize_boxes(df: pd.DataFrame) -> pd.DataFrame:
     x_parametric = np.polyfit(df['frame'], df['x_center'], 2)
     y_parametric = np.polyfit(df['frame'], df['y_center'], 2)
     #adds the new boxes
-    framemax = df['frame'].max()
-    framearr = np.zeros(framemax+1)
+    framearr = np.zeros(toi[1]-toi[0])
     for i in df['frame']:
-        framearr[i] = 1
+        framearr[i-toi[0]] = 1
     missing_rows = {}
-    for i in range(len(framearr)):
+    for i in range(toi[1] - toi[0]):
         if(framearr[i] == 0):
-            missing_rows[i] = [0, 0, 0, 0, np.polyval(x_parametric, i),
-                               np.polyval(y_parametric, i)]
+            missing_rows[i+toi[0]] = [0, 0, 0, 0, 
+                                      np.polyval(x_parametric, i+toi[0]),
+                                      np.polyval(y_parametric, i+toi[0])]
     missing_df = pd.DataFrame.from_dict(missing_rows, orient='index', \
                                         columns=['x1', 'y1', 'x2',\
                                 'y2', 'x_center', 'y_center'])
@@ -319,10 +312,9 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     vid_data = read_video_data(path)
     toi = get_toi(vid_data, pitch_velo, df)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
-    df['frame'] = df['frame'] - toi[0]
     df = eliminate_outliers(df)
-    df = normalize_boxes(df)
-    df['frame'] = df['frame'] + toi[0]
+    df = normalize_boxes(df, toi)
+    print(df)
     video_with_boxes(df, path, out_path)
     df.to_csv(new_boxes_path, index=False)
     
