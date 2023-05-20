@@ -5,11 +5,11 @@ import pandas as pd
 from ultralytics import YOLO
 
 model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid1_path = "pitcher_vids/pitcher (4).mp4"
-pitch1_velo = 98
-boxes_path = "boxes4.csv"
-poly_deg = 2
-out_path = "processed4.mp4"
+vid1_path = "pitcher_vids/sale.mp4"
+pitch1_velo = 95
+boxes_path = "csvs/sale.csv"
+poly_deg = 3
+out_path = "processed_vids/saletracked.mp4"
 
 if __name__ == "__main__":
     # Loads the model, change pathing based on what you need

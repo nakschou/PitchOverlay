@@ -4,10 +4,10 @@ import numpy as np
 import os
 import math
 
-path = "pitcher_vids/pitcher (4).mp4"
-boxes_path = 'csvs/boxes1.csv'
-out_path = "processed_vids/tracker1.mp4"
-new_boxes_path = 'csvs/new_boxes1.csv'
+path = "pitcher_vids/sale.mp4"
+boxes_path = 'csvs/saleboxes.csv'
+out_path = "processed_vids/saleboxes.mp4"
+new_boxes_path = 'csvs/new_sale1.csv'
 pitch_velo = 98 #mph
 poly_deg = 3 #degree of polynomial used for parametric curve
 
@@ -206,7 +206,7 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     Returns:
         DataFrame: Dataframe with normalized boxes.
     """
-    x_increment = 3 #make bounding box bigger by x_increment pixels
+    x_increment = 2 #make bounding box bigger by x_increment pixels
     y_increment = 0 #make bounding box bigger by y_increment pixels
     #gets the sizes of the boxes
     df['x_size'] = (df['x2'] - df['x1'])
@@ -222,7 +222,7 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     #adds the new boxes
     framearr = np.zeros(toi[1]-toi[0])
     for i in df['frame']:
-        framearr[i-toi[0]] = 1
+        framearr[i-toi[0]-1] = 1
     missing_rows = {}
     for i in range(toi[1] - toi[0]):
         if(framearr[i] == 0):

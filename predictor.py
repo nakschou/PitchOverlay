@@ -5,9 +5,9 @@ import pandas as pd
 import os
 
 model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid_path = 'pitcher_vids/pitcher (4).mp4'
-boxes_path = 'csvs/boxes1.csv'
-out_path = "processed_vids/tracker1.mp4"
+vid_path = 'pitcher_vids/sale.mp4'
+boxes_path = 'csvs/saleboxes.csv'
+out_path = "processed_vids/salepredict.mp4"
 
 def get_boxes(model, vid_path: str) -> dict:
     """

@@ -3,14 +3,15 @@ import cv2 as cv
 import numpy as np
 import os
 
-path = "pitcher_vids/pitcher (3).mp4"
-boxes_path = 'new_boxes2.csv'
-out_path = "tracker2processed.mp4"
-poly_deg = 2
+path = "pitcher_vids/sale.mp4"
+boxes_path = 'csvs/new_sale1.csv'
+out_path = "processed_vids/salemasked.mp4"
+poly_deg = 3
 
 def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
     """
-    Creates a video with circles around the detected balls.
+    Creates a video with circles around the detected balls, then takes those
+    circles and adds them to a dataframe.
 
     Args:
         df (DataFrame): Dataframe containing bounding box data.
@@ -26,12 +27,17 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
         raise ValueError("Invalid path")
     cap = cv.VideoCapture(vid_path)
     length = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    framerate = int(cap.get(cv.CAP_PROP_FPS))
+    #specifies the codec and creates a video writer object
+    fourcc = cv.VideoWriter_fourcc(*'mp4v')
+    out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap.get(3)), \
+                                                       int(cap.get(4))))
     circles_dct = {}
     for i in range(length):
         ret, frame = cap.read()
         if ret == True:
             # Define the region of interest (ROI) as a rectangular mask
-                mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+                mask1 = np.zeros(frame.shape[:2], dtype=np.uint8)
                 if i in df['frame'].values:
                     row = df.loc[df['frame'] == i]
                     x1 = int(row['x1'].iloc[0])
@@ -40,10 +46,9 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
                     y2 = int(row['y2'].iloc[0])
                     x_center = int(row['x_center'].iloc[0])
                     y_center = int(row['y_center'].iloc[0])
-                    mask[y1:y2, x1:x2] = 255
+                    mask1[y1:y2, x1:x2] = 255
                     # Apply the mask to the input image
                     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-                    masked_img = cv.bitwise_and(hsv, hsv, mask=mask)
 
                     # Get the pixel values at (x, y)
                     pixel = hsv[y_center, x_center]
@@ -52,9 +57,11 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
                     upper = pixel + np.array([360, 15, 70])
                 
                     # preparing the mask to overlay
-                    mask = cv.inRange(hsv, lower, upper)
+                    mask2 = cv.inRange(hsv, lower, upper)
+
+                    combined_mask = cv.bitwise_and(mask1, mask2)
                     
-                    result = cv.bitwise_and(masked_img, frame, mask = mask)
+                    result = cv.bitwise_and(frame, frame, mask = combined_mask)
                     non_zero_pixels = np.where(result != 0)
                     #print(non_zero_pixels)
 
@@ -72,6 +79,7 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
                 else:
                     mask = frame
                     result = frame
+                out.write(result)
                 if cv.waitKey(1) & 0xFF == ord('q'):
                     break
         else:
@@ -81,6 +89,7 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
     cv.destroyAllWindows()
     return circles_dct
 
+'''
 def get_mask(dct: dict, vid_path: str, out_path: str) -> None:
     """
     Creates a video with circles around the detected balls.
@@ -131,6 +140,7 @@ def get_mask(dct: dict, vid_path: str, out_path: str) -> None:
     # Release the video writer object
     out.release()
     cv.destroyAllWindows()
+'''
 
 def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
     """
@@ -146,7 +156,7 @@ def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
     """
     df = pd.read_csv(boxes_path)
     dct = get_circles(df, vid_path)
-    get_mask(dct, vid_path, out_path)
+    #get_mask(dct, vid_path, out_path)
 
 if __name__ == "__main__":
     vp_runner(boxes_path, path, out_path)
