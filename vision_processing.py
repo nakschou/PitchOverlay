@@ -8,7 +8,7 @@ boxes_path = 'csvs/new_sale1.csv'
 out_path = "processed_vids/salemasked.mp4"
 poly_deg = 3
 
-def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
+def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
     """
     Creates a video with circles around the detected balls, then takes those
     circles and adds them to a dataframe.
@@ -53,8 +53,8 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
                     # Get the pixel values at (x, y)
                     pixel = hsv[y_center, x_center]
         
-                    lower = pixel - np.array([360, 15, 70])
-                    upper = pixel + np.array([360, 15, 70])
+                    lower = pixel - np.array([360, 25, 70])
+                    upper = pixel + np.array([360, 25, 70])
                 
                     # preparing the mask to overlay
                     mask2 = cv.inRange(hsv, lower, upper)
@@ -76,10 +76,7 @@ def get_circles(df: pd.DataFrame, vid_path: str) -> dict:
                     circles_dct[i] = (mean_x, mean_y, 2*mean_dist)
                     cv.circle(frame, (mean_x, mean_y), 8, 
                               (0, 255, 0), 2)
-                else:
-                    mask = frame
-                    result = frame
-                out.write(result)
+                    out.write(result)
                 if cv.waitKey(1) & 0xFF == ord('q'):
                     break
         else:
@@ -155,7 +152,7 @@ def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
         None
     """
     df = pd.read_csv(boxes_path)
-    dct = get_circles(df, vid_path)
+    dct = get_circles(df, vid_path, out_path)
     #get_mask(dct, vid_path, out_path)
 
 if __name__ == "__main__":

@@ -5,9 +5,9 @@ import pandas as pd
 import os
 
 model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid_path = 'pitcher_vids/sale.mp4'
-boxes_path = 'csvs/saleboxes.csv'
-out_path = "processed_vids/salepredict.mp4"
+vid_path = 'pitcher_vids/gallen1.mp4'
+boxes_path = 'csvs/gallenboxes.csv'
+out_path = "processed_vids/gallenpredict.mp4"
 
 def get_boxes(model, vid_path: str) -> dict:
     """
@@ -104,6 +104,7 @@ def predictor_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
     df = convert_boxes_df(boxes_dct)
     # Saves the dataframe to a csv
     #print(df)
+    df.sort_values(by=['frame'], inplace=True)
     df.to_csv(boxes_path, index=False)
 
 if __name__ == "__main__":

@@ -4,11 +4,11 @@ import numpy as np
 import os
 import math
 
-path = "pitcher_vids/sale.mp4"
-boxes_path = 'csvs/saleboxes.csv'
-out_path = "processed_vids/saleboxes.mp4"
-new_boxes_path = 'csvs/new_sale1.csv'
-pitch_velo = 98 #mph
+path = "pitcher_vids/gallen1.mp4"
+boxes_path = 'csvs/gallenboxes.csv'
+out_path = "processed_vids/gallenboxes.mp4"
+new_boxes_path = 'csvs/gallenboxes2.csv'
+pitch_velo = 89 #mph
 poly_deg = 3 #degree of polynomial used for parametric curve
 
 def pitch_time_frames(speed: int) -> int:
@@ -108,10 +108,11 @@ def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame) -> \
     for i in range(1, vid_data[1]-window):
         curr_detections -= frame_arr[i-1]
         curr_detections += frame_arr[i+window-1]
-        if curr_detections >= max_detections:
+        if curr_detections > max_detections:
             max_detections = curr_detections
             max_detections_i = i
     return (max_detections_i, max_detections_i + window)
+
 def create_frame_arr(df: pd.DataFrame, length: int) -> np.ndarray:
     """
     Helper function for get_toi. 
@@ -151,11 +152,12 @@ def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
 
     Args:
         df (DataFrame): Dataframe containing bounding box data.
+        conf (int): Confidence threshold.
     
     Returns:
         DataFrame: Dataframe with outliers removed.
     """
-    confidence_threshold = 0.5 #threshold for points used for parametric curve
+    confidence_threshold = df['confidence'].mean()
     confdf = df[df['confidence'] > confidence_threshold]
     #parametricizes the curve of the ball
     x_parametric = np.polyfit(confdf['frame'], confdf['x_center'], poly_deg)
@@ -220,15 +222,17 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     x_parametric = np.polyfit(df['frame'], df['x_center'], 2)
     y_parametric = np.polyfit(df['frame'], df['y_center'], 2)
     #adds the new boxes
-    framearr = np.zeros(toi[1]-toi[0])
+    framearr = np.zeros(toi[1]-toi[0]+1)
     for i in df['frame']:
-        framearr[i-toi[0]-1] = 1
+        framearr[i-toi[0]] = 1
     missing_rows = {}
     for i in range(toi[1] - toi[0]):
         if(framearr[i] == 0):
+            #print(i+toi[0])
             missing_rows[i+toi[0]] = [0, 0, 0, 0, 
                                       np.polyval(x_parametric, i+toi[0]),
                                       np.polyval(y_parametric, i+toi[0])]
+    #print(missing_rows)
     missing_df = pd.DataFrame.from_dict(missing_rows, orient='index', \
                                         columns=['x1', 'y1', 'x2',\
                                 'y2', 'x_center', 'y_center'])
@@ -240,6 +244,8 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     df['x2'] = df['x_center'] + newxsize/2
     df['y1'] = df['y_center'] - newysize/2
     df['y2'] = df['y_center'] + newysize/2
+    df.sort_values(by=['frame'], inplace=True)
+    df.reset_index(inplace=True)
     return df
 
 
@@ -278,6 +284,8 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
                 y2 = int(row['y2'].iloc[0])
                 cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             # Write the modified frame to the output video
+            cv.putText(frame, str(i), (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, \
+                          (0, 255, 0), 2, cv.LINE_AA)
             out.write(frame) 
             cv.imshow('frame', frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
@@ -314,7 +322,6 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df = eliminate_outliers(df)
     df = normalize_boxes(df, toi)
-    print(df)
     video_with_boxes(df, path, out_path)
     df.to_csv(new_boxes_path, index=False)
     
