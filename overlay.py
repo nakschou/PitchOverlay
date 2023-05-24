@@ -2,10 +2,7 @@ import cv2 as cv
 import numpy as np
 import os
 
-inp1_path = "processed_vids/coletracked.mp4"
-inp2_path = "pitcher_vids/colecurve.mp4"
-
-def overlay_video(inp1_path, inp2_path, toi, out_path):
+def overlay_video(inp1_path, inp2_path, toi, out_path, csv1):
     """
     Given two videos and a timeframe of interest, overlays the second video
     onto the first video.
@@ -41,7 +38,7 @@ def overlay_video(inp1_path, inp2_path, toi, out_path):
         if ret2 == True:
             if(start):
                 ret1, frame1 = cap1.read()
-                result = cv.addWeighted(frame1, 1.0, frame2, 1.0, 0)
+                result = cv.addWeighted(frame1, 0.5, frame2, 0.5, 0)
             else:
                 result = frame2
             out.write(result)

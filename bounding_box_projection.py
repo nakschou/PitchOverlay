@@ -4,11 +4,11 @@ import numpy as np
 import os
 import math
 
-path = "pitcher_vids/gallen1.mp4"
-boxes_path = 'csvs/gallenboxes.csv'
-out_path = "processed_vids/gallenboxes.mp4"
-new_boxes_path = 'csvs/gallenboxes2.csv'
-pitch_velo = 89 #mph
+path = "pitcher_vids/colefb1.mp4"
+boxes_path = 'csvs/coleboxes.csv'
+out_path = "processed_vids/coleboxes.mp4"
+new_boxes_path = 'csvs/coleboxes2.csv'
+pitch_velo = 98 #mph
 poly_deg = 3 #degree of polynomial used for parametric curve
 
 def pitch_time_frames(speed: int) -> int:
