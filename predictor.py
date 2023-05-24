@@ -2,12 +2,16 @@ from ultralytics import YOLO
 import numpy as np
 import cv2 as cv
 import pandas as pd
+import config as cfg
+import utility as ut
 import os
 
-model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid_path = 'pitcher_vids/colefb1.mp4'
-boxes_path = 'csvs/coleboxes.csv'
-out_path = "processed_vids/cole.mp4"
+model_path = cfg.fileConfig.model_path
+vid_path = ut.video_path(cfg.fileConfig.pitch1_name, 
+                               cfg.fileConfig.pitcher_vids_path)
+boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name,
+                                cfg.fileConfig.csv_path,
+                                cfg.fileConfig.predictor_suffix)
 
 def get_boxes(model, vid_path: str) -> dict:
     """

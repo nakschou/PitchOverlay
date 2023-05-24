@@ -1,15 +1,25 @@
 import pandas as pd
 import cv2 as cv
 import numpy as np
+import utility as ut
+import config as cfg
 import os
 import math
 
-path = "pitcher_vids/colefb1.mp4"
-boxes_path = 'csvs/coleboxes.csv'
-out_path = "processed_vids/coleboxes.mp4"
-new_boxes_path = 'csvs/coleboxes2.csv'
-pitch_velo = 98 #mph
-poly_deg = 3 #degree of polynomial used for parametric curve
+path = ut.video_path(cfg.fileConfig.pitch1_name, 
+                           cfg.fileConfig.pitcher_vids_path)
+boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name, 
+                                cfg.fileConfig.csv_path, 
+                                cfg.fileConfig.predictor_suffix)
+out_path = ut.video_path_suffix(cfg.fileConfig.pitch1_name, 
+                           cfg.fileConfig.pitcher_vids_path,
+                           cfg.fileConfig.boxes_suffix)
+new_boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name,
+                                    cfg.fileConfig.csv_path,
+                                    cfg.fileConfig.boxes_suffix)
+pitch_velo = cfg.fileConfig.pitch1_velo
+start_frame = cfg.fileConfig.release1_frame
+poly_deg = cfg.fileConfig.poly_deg
 
 def pitch_time_frames(speed: int) -> int:
     # Convert mph to m/s
@@ -73,7 +83,7 @@ def add_center(df: pd.DataFrame) -> pd.DataFrame:
     df['y_center'] = (df['y1'] + df['y2']) / 2
     return df
 
-def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame) -> \
+def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame, start_frame: int) -> \
     tuple:
     """
     Gets a "timeframe of interest" (TOI) for each pitch.
@@ -96,22 +106,25 @@ def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame) -> \
     window = pitch_time_frames(velo)
     if window > vid_data[1]:
         raise ValueError("Desired timeframe is longer than video")
-    frame_arr = create_frame_arr(df, vid_data[1])
-    #gets the number of detections in first window 
-    curr_detections = 0
-    for i in range(window):
-        curr_detections += frame_arr[i]
-    max_detections = curr_detections
-    max_detections_i = 0
-    #finds the maximum number of detections in a window, if there are multiple
-    #windows with the same number of detections, it takes the middle one  
-    for i in range(1, vid_data[1]-window):
-        curr_detections -= frame_arr[i-1]
-        curr_detections += frame_arr[i+window-1]
-        if curr_detections > max_detections:
-            max_detections = curr_detections
-            max_detections_i = i
-    return (max_detections_i, max_detections_i + window)
+    if(start_frame < 0):
+        frame_arr = create_frame_arr(df, vid_data[1])
+        #gets the number of detections in first window 
+        curr_detections = 0
+        for i in range(window):
+            curr_detections += frame_arr[i]
+        max_detections = curr_detections
+        max_detections_i = 0
+        #finds the maximum number of detections in a window, if there are multiple
+        #windows with the same number of detections, it takes the middle one  
+        for i in range(1, vid_data[1]-window):
+            curr_detections -= frame_arr[i-1]
+            curr_detections += frame_arr[i+window-1]
+            if curr_detections > max_detections:
+                max_detections = curr_detections
+                max_detections_i = i
+        return (max_detections_i, max_detections_i + window)
+    else:
+        return (start_frame, start_frame + window)
 
 def create_frame_arr(df: pd.DataFrame, length: int) -> np.ndarray:
     """

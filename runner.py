@@ -3,19 +3,32 @@ import bounding_box_projection as bbp
 import predictor as pred
 import pandas as pd
 import overlay as ov
+import config as cfg
+import utility as ut
 from ultralytics import YOLO
 
-model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
-vid1_path = "pitcher_vids/colefb1.mp4"
-vid2_path = "pitcher_vids/colekc1.mp4"
-pitch1_velo = 98
-pitch2_velo = 86
-boxes_path = "csvs/cole1.csv"
-boxes2_path = "csvs/cole2.csv"
-poly_deg = 3
-out1_path = "processed_vids/cole1tracked.mp4"
-out2_path = "processed_vids/cole2tracked.mp4"
-final_outpath = "processed_vids/overlay.mp4"
+model_path = cfg.fileConfig.model_path
+vid1_path = ut.video_path(cfg.fileConfig.pitch1_name, 
+                                cfg.fileConfig.pitcher_vids_path)
+vid2_path = ut.video_path(cfg.fileConfig.pitch2_name, 
+                                cfg.fileConfig.pitcher_vids_path)
+pitch1_velo = cfg.fileConfig.pitch1_velo
+pitch2_velo = cfg.fileConfig.pitch2_velo
+start1_frame = cfg.fileConfig.start1_frame
+start2_frame = cfg.fileConfig.start2_frame
+boxes_path = ut.csv_path(cfg.fileConfig.pitch1_name, 
+                               cfg.fileConfig.csv_path)
+boxes2_path = ut.csv_path(cfg.fileConfig.pitch2_name, 
+                                cfg.fileConfig.csv_path)
+poly_deg = cfg.fileConfig.poly_deg
+out1_path = ut.video_path_suffix(cfg.fileConfig.pitch1_name, 
+                                cfg.fileConfig.processed_vids_path,
+                                cfg.fileConfig.masks_suffix)
+out2_path = ut.video_path_suffix(cfg.fileConfig.pitch2_name, 
+                                cfg.fileConfig.processed_vids_path,
+                                cfg.fileConfig.masks_suffix)
+final_outpath = ut.video_path(cfg.fileConfig.final_file_name, 
+                                    cfg.fileConfig.processed_vids_path)
 
 if __name__ == "__main__":
     # Loads the model, change pathing based on what you need
@@ -29,7 +42,7 @@ if __name__ == "__main__":
     # Reads video data
     vid_data = bbp.read_video_data(vid1_path)
     # Sets the timeframe of interest
-    toi = bbp.get_toi(vid_data, pitch1_velo, df)
+    toi = bbp.get_toi(vid_data, pitch1_velo, df, start1_frame)
     #shrinks the dataframe to the time of interest
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df = bbp.eliminate_outliers(df)

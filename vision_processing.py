@@ -1,11 +1,18 @@
 import pandas as pd
 import cv2 as cv
 import numpy as np
+import config as cfg
+import utility as ut
 import os
 
-path = "pitcher_vids/colefb1.mp4"
-boxes_path = 'csvs/coleboxes2.csv'
-out_path = "processed_vids/colemasked.mp4"
+path = ut.video_path(cfg.fileConfig.pitch1_name,
+                           cfg.fileConfig.pitcher_vids_path)
+boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name,
+                                 cfg.fileConfig.csv_path,
+                                 cfg.fileConfig.boxes_suffix)
+out_path = ut.video_path_suffix(cfg.fileConfig.pitch1_name,
+                                 cfg.fileConfig.processed_vids_path,
+                                 cfg.fileConfig.masks_suffix)
 poly_deg = 3
 
 def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
