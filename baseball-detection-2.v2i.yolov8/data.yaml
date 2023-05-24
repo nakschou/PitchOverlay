@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['baseball']
+
+roboflow:
+  workspace: pitchtracking
+  project: baseball-detection-2
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/pitchtracking/baseball-detection-2/dataset/2
