@@ -170,7 +170,7 @@ def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame: Dataframe with outliers removed.
     """
-    confidence_threshold = df['confidence'].mean()
+    confidence_threshold = df['confidence'].mean()*0.8
     confdf = df[df['confidence'] > confidence_threshold]
     #parametricizes the curve of the ball
     x_parametric = np.polyfit(confdf['frame'], confdf['x_center'], poly_deg)

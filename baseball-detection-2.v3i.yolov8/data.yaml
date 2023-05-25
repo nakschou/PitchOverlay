@@ -1,0 +1,13 @@
+train: C:\Users\Home\Desktop\OpenCV2023\baseball-detection-2.v3i.yolov8\train\images
+val: C:\Users\Home\Desktop\OpenCV2023\baseball-detection-2.v3i.yolov8\valid\images
+test: C:\Users\Home\Desktop\OpenCV2023\baseball-detection-2.v3i.yolov8\test\images
+
+nc: 1
+names: ['baseball']
+
+roboflow:
+  workspace: pitchtracking
+  project: baseball-detection-2
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/pitchtracking/baseball-detection-2/dataset/3
