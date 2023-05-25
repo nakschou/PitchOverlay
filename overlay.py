@@ -1,8 +1,10 @@
 import cv2 as cv
 import numpy as np
+import pandas as pd
 import os
 
-def overlay_video(inp1_path, inp2_path, toi, out_path, csv1):
+def overlay_video(inp1_path: str, inp2_path: str, toi: str, out_path: str, 
+                  csv1: str, csv2: str) -> dict:
     """
     Given two videos and a timeframe of interest, overlays the second video
     onto the first video.
@@ -17,6 +19,7 @@ def overlay_video(inp1_path, inp2_path, toi, out_path, csv1):
     Raises:
         ValueError: If vid_path is not a valid path.
     """
+    df = pd.read_csv(csv1)
     if not os.path.isfile(inp1_path) or not os.path.isfile(inp2_path):
         raise ValueError("Invalid path")
     cap1 = cv.VideoCapture(inp1_path)
@@ -29,6 +32,8 @@ def overlay_video(inp1_path, inp2_path, toi, out_path, csv1):
     out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap2.get(3)), \
                                                        int(cap2.get(4))))
     start = False
+    firstlines = {}
+    firstmin = df['frame'].min()
     for i in range(length):
         if(i == toi[0]):
             start = True
@@ -37,10 +42,19 @@ def overlay_video(inp1_path, inp2_path, toi, out_path, csv1):
         ret2, frame2 = cap2.read()
         if ret2 == True:
             if(start):
+                if(i-1 >= firstmin):
+                    x1 = int(df.loc[df['frame'] == i-1]['x_center'].iloc[0])
+                    y1 = int(df.loc[df['frame'] == i-1]['y_center'].iloc[0])
+                    x2 = int(df.loc[df['frame'] == i]['x_center'].iloc[0])
+                    y2 = int(df.loc[df['frame'] == i]['y_center'].iloc[0])
+                    firstlines[i] = ((x1, y1), (x2, y2))
                 ret1, frame1 = cap1.read()
-                result = cv.addWeighted(frame1, 0.5, frame2, 0.5, 0)
+                result = cv.bitwise_or(frame1, frame2)
             else:
                 result = frame2
+            for line in firstlines:
+                cv.line(result, firstlines[line][0], firstlines[line][1],
+                        (0, 0, 255), 2)
             out.write(result)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break

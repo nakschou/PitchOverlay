@@ -12,7 +12,7 @@ boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name,
                                 cfg.fileConfig.csv_path, 
                                 cfg.fileConfig.predictor_suffix)
 out_path = ut.video_path_suffix(cfg.fileConfig.pitch1_name, 
-                           cfg.fileConfig.pitcher_vids_path,
+                           cfg.fileConfig.processed_vids_path,
                            cfg.fileConfig.boxes_suffix)
 new_boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name,
                                     cfg.fileConfig.csv_path,
@@ -331,7 +331,7 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     df = pd.read_csv(boxes_path)
     df = add_center(df)
     vid_data = read_video_data(path)
-    toi = get_toi(vid_data, pitch_velo, df)
+    toi = get_toi(vid_data, pitch_velo, df, start_frame)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df = eliminate_outliers(df)
     df = normalize_boxes(df, toi)

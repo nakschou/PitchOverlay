@@ -14,8 +14,8 @@ vid2_path = ut.video_path(cfg.fileConfig.pitch2_name,
                                 cfg.fileConfig.pitcher_vids_path)
 pitch1_velo = cfg.fileConfig.pitch1_velo
 pitch2_velo = cfg.fileConfig.pitch2_velo
-start1_frame = cfg.fileConfig.start1_frame
-start2_frame = cfg.fileConfig.start2_frame
+start1_frame = cfg.fileConfig.release1_frame
+start2_frame = cfg.fileConfig.release2_frame
 boxes_path = ut.csv_path(cfg.fileConfig.pitch1_name, 
                                cfg.fileConfig.csv_path)
 boxes2_path = ut.csv_path(cfg.fileConfig.pitch2_name, 
@@ -33,6 +33,10 @@ final_outpath = ut.video_path(cfg.fileConfig.final_file_name,
 if __name__ == "__main__":
     # Loads the model, change pathing based on what you need
     model = YOLO(model_path)
+    if(cfg.fileConfig.release1_frame < 0):
+        cfg.fileConfig.release1_frame = ut.get_release_frame(vid1_path)
+    if(cfg.fileConfig.release2_frame < 0):
+        cfg.fileConfig.release2_frame = ut.get_release_frame(vid2_path)
     # Gets the boxes in a format unfit for a dataframe
     boxes_dct = pred.get_boxes(model, vid1_path)
     # Converts the boxes to fittable format and writes to dataframe
@@ -49,4 +53,4 @@ if __name__ == "__main__":
     df = bbp.normalize_boxes(df, toi)
     df.to_csv(boxes_path)
     dct = vp.get_circles(df, vid1_path, out1_path)
-    ov.overlay_video(out1_path, vid2_path, toi, final_outpath, boxes_path)
+    ov.overlay_video(out1_path, vid2_path, toi, final_outpath, boxes_path, boxes2_path)

@@ -13,7 +13,7 @@ boxes_path = ut.csv_path_suffix(cfg.fileConfig.pitch1_name,
 out_path = ut.video_path_suffix(cfg.fileConfig.pitch1_name,
                                  cfg.fileConfig.processed_vids_path,
                                  cfg.fileConfig.masks_suffix)
-poly_deg = 3
+poly_deg = cfg.fileConfig.poly_deg
 
 def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
     """
@@ -54,14 +54,15 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
                     x_center = int(row['x_center'].iloc[0])
                     y_center = int(row['y_center'].iloc[0])
                     mask1[y1:y2, x1:x2] = 255
-                    # Apply the mask to the input image
+
+                    # create a converted version of the frame
                     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
                     # Get the pixel values at (x, y)
                     pixel = hsv[y_center, x_center]
         
-                    lower = pixel - np.array([360, 25, 70])
-                    upper = pixel + np.array([360, 12, 70])
+                    lower = pixel - np.array([360, 360, 360])
+                    upper = pixel + np.array([360, 10, 360])
                 
                     # preparing the mask to overlay
                     mask2 = cv.inRange(hsv, lower, upper)

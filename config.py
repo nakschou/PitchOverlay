@@ -1,11 +1,15 @@
 class fileConfig:
-    final_file_name = "coleoverlay"
-    pitch1_name = "colefb1"
-    pitch2_name = "colekc1"
-    pitch1_velo = 98
-    pitch2_velo = 86
-    release1_frame = -1
+    final_file_name = "coleoverlay" #Name of the final file, without .mp4
+    pitch1_name = "colefb1" #Name of the file of the first pitch, without .mp4
+    pitch1_velo = 98 #Velocity of the first pitch
+    #Try and find this, otherwise set to a negative number
+    #to have the program find it for you (it will not be 100% accurate)
+    release1_frame = -1 
+    pitch2_name = "colekc1" #Name of the file of the second pitch, without .mp4
+    pitch2_velo = 86 #Velocity of the second pitch
     release2_frame = -1
+
+    #Paths and suffixes
     processed_vids_path = "processed_vids/"
     pitcher_vids_path = "pitcher_vids/"
     csv_path = "csvs/"
