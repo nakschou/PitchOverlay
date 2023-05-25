@@ -5,10 +5,10 @@ import os
 import math
 
 path = "pitcher_vids/gallen1.mp4"
-boxes_path = 'csvs/gallenboxes.csv'
-out_path = "processed_vids/gallenboxes.mp4"
-new_boxes_path = 'csvs/gallenboxes2.csv'
-pitch_velo = 89 #mph
+boxes_path = 'csvs/gallen1boxes.csv'
+out_path = "processed_vids/gallen1boxes.mp4"
+new_boxes_path = 'csvs/gallenboxes1.csv'
+pitch_velo = 83 #mph
 poly_deg = 3 #degree of polynomial used for parametric curve
 
 def pitch_time_frames(speed: int) -> int:
@@ -157,7 +157,7 @@ def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame: Dataframe with outliers removed.
     """
-    confidence_threshold = df['confidence'].mean()
+    confidence_threshold = df['confidence'].mean()*0.8
     confdf = df[df['confidence'] > confidence_threshold]
     #parametricizes the curve of the ball
     x_parametric = np.polyfit(confdf['frame'], confdf['x_center'], poly_deg)

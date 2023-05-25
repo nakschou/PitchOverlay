@@ -5,7 +5,7 @@ import pandas as pd
 import overlay as ov
 from ultralytics import YOLO
 
-model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
+model_path = 'runs/detect/pitch_detection_v32/weights/best.pt'
 vid1_path = "pitcher_vids/gallen1.mp4"
 vid2_path = "pitcher_vids/gallen2.mp4"
 pitch1_velo = 89

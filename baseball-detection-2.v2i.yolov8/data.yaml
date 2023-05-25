@@ -1,6 +1,6 @@
-train: ../train/images
-val: ../valid/images
-test: ../test/images
+train: C:\Users\Home\Desktop\OpenCV2023\baseball-detection-2.v1i.yolov8\train/images
+val: C:\Users\Home\Desktop\OpenCV2023\baseball-detection-2.v1i.yolov8\valid/images
+test: C:\Users\Home\Desktop\OpenCV2023\baseball-detection-2.v1i.yolov8\test/images
 
 nc: 1
 names: ['baseball']
