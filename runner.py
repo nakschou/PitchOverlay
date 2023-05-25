@@ -13,9 +13,9 @@ pitch2_velo = 83
 boxes_path = "csvs/gallen1.csv"
 boxes2_path = "csvs/gallen2.csv"
 poly_deg = 3
-out1_path = "processed_vids/gallen1tracked.mp4"
-out2_path = "processed_vids/gallen2tracked.mp4"
-final_outpath = "processed_vids/overlay2.mp4"
+out1_path = "processed_vids/cole1tracked.mp4"
+out2_path = "processed_vids/cole2tracked.mp4"
+final_outpath = "processed_vids/overlay.mp4"
 
 if __name__ == "__main__":
     # Loads the model, change pathing based on what you need
@@ -36,4 +36,4 @@ if __name__ == "__main__":
     df = bbp.normalize_boxes(df, toi)
     df.to_csv(boxes_path)
     dct = vp.get_circles(df, vid1_path, out1_path)
-    ov.overlay_video(out1_path, vid2_path, toi, final_outpath)
+    ov.overlay_video(out1_path, vid2_path, toi, final_outpath, boxes_path)

@@ -3,9 +3,9 @@ import cv2 as cv
 import numpy as np
 import os
 
-path = "pitcher_vids/sale.mp4"
-boxes_path = 'csvs/new_sale1.csv'
-out_path = "processed_vids/salemasked.mp4"
+path = "pitcher_vids/colefb1.mp4"
+boxes_path = 'csvs/coleboxes2.csv'
+out_path = "processed_vids/colemasked.mp4"
 poly_deg = 3
 
 def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
@@ -54,7 +54,7 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
                     pixel = hsv[y_center, x_center]
         
                     lower = pixel - np.array([360, 25, 70])
-                    upper = pixel + np.array([360, 25, 70])
+                    upper = pixel + np.array([360, 12, 70])
                 
                     # preparing the mask to overlay
                     mask2 = cv.inRange(hsv, lower, upper)
