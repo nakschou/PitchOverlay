@@ -4,10 +4,10 @@ class fileConfig:
     pitch1_velo = 98 #Velocity of the first pitch
     #Try and find this, otherwise set to a negative number
     #to have the program find it for you (it will not be 100% accurate)
-    release1_frame = -1 
+    release1_frame = 180
     pitch2_name = "colekc1" #Name of the file of the second pitch, without .mp4
     pitch2_velo = 86 #Velocity of the second pitch
-    release2_frame = -1
+    release2_frame = 182
 
     #Paths and suffixes
     processed_vids_path = "processed_vids/"
@@ -19,5 +19,5 @@ class fileConfig:
 
     #Generally don't change these
     poly_deg = 3
-    model_path = 'runs/detect/pitch_detection_v12/weights/best.pt'
+    model_path = 'runs/detect/pitch_detection_v42/weights/best.pt'
     

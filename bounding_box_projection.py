@@ -170,7 +170,7 @@ def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame: Dataframe with outliers removed.
     """
-    confidence_threshold = df['confidence'].mean()*0.8
+    confidence_threshold = df['confidence'].mean()
     confdf = df[df['confidence'] > confidence_threshold]
     #parametricizes the curve of the ball
     x_parametric = np.polyfit(confdf['frame'], confdf['x_center'], poly_deg)
@@ -232,16 +232,16 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     df = df.drop('x_size', axis=1)
     df = df.drop('y_size', axis=1)
     #new parametric equations
-    x_parametric = np.polyfit(df['frame'], df['x_center'], 2)
-    y_parametric = np.polyfit(df['frame'], df['y_center'], 2)
+    x_parametric = np.polyfit(df['frame'], df['x_center'], poly_deg)
+    y_parametric = np.polyfit(df['frame'], df['y_center'], poly_deg)
     #adds the new boxes
     framearr = np.zeros(toi[1]-toi[0]+1)
     for i in df['frame']:
         framearr[i-toi[0]] = 1
     missing_rows = {}
     for i in range(toi[1] - toi[0]):
+        print("curr frame: ", i+toi[0])
         if(framearr[i] == 0):
-            #print(i+toi[0])
             missing_rows[i+toi[0]] = [0, 0, 0, 0, 
                                       np.polyval(x_parametric, i+toi[0]),
                                       np.polyval(y_parametric, i+toi[0])]
@@ -280,25 +280,30 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     if not os.path.isfile(path):
         raise ValueError("Invalid path")
     cap = cv.VideoCapture(vid_path)
-    length = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
     framerate = int(cap.get(cv.CAP_PROP_FPS))
     #specifies the codec and creates a video writer object
     fourcc = cv.VideoWriter_fourcc(*'mp4v')
     out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap.get(3)), \
                                                        int(cap.get(4))))
-    for i in range(length):
+    curr_frame = 0
+    while cap.isOpened():
         ret, frame = cap.read()
         if ret == True:
-            if i in df['frame'].values:
-                row = df.loc[df['frame'] == i]
+            curr_frame = cap.get(cv.CAP_PROP_POS_FRAMES)
+            if curr_frame in df['frame'].values:
+                row = df.loc[df['frame'] == curr_frame]
                 x1 = int(row['x1'].iloc[0])
                 y1 = int(row['y1'].iloc[0])
                 x2 = int(row['x2'].iloc[0])
                 y2 = int(row['y2'].iloc[0])
                 cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             # Write the modified frame to the output video
-            cv.putText(frame, str(i), (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, \
+            str2 = cap.get(cv.CAP_PROP_POS_MSEC)
+            cv.putText(frame, str(curr_frame), (50, 50), 
+                       cv.FONT_HERSHEY_SIMPLEX, 1,
                           (0, 255, 0), 2, cv.LINE_AA)
+            cv.putText(frame, str(str2), (50, 100), cv.FONT_HERSHEY_SIMPLEX, 
+                       1, (0, 255, 0), 2, cv.LINE_AA)
             out.write(frame) 
             cv.imshow('frame', frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
@@ -331,6 +336,11 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     df = pd.read_csv(boxes_path)
     df = add_center(df)
     vid_data = read_video_data(path)
+    if(cfg.fileConfig.release1_frame < 0):
+        start_frame = ut.get_release_frame(vid_path)
+    else:
+        start_frame = cfg.fileConfig.release1_frame
+    #print(start_frame)
     toi = get_toi(vid_data, pitch_velo, df, start_frame)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df = eliminate_outliers(df)

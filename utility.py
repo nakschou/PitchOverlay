@@ -71,7 +71,7 @@ def get_release_frame(vid_path: str) -> int:
         int: Release frame
     """
     cap = cv.VideoCapture(vid_path)
-    counter = 0
+    framerate = int(cap.get(cv.CAP_PROP_FPS))
     current_frame = 0
     string = "'.' -> +1 frame"
     string2 = "',' -> -1 frame"
@@ -81,48 +81,46 @@ def get_release_frame(vid_path: str) -> int:
     string6 = "'=' -> +20 frames"
     str_arr = [string, string2, string3, string4, string5, string6]
     while cap.isOpened():
+        # Set the frame position in the video
+        cap.set(cv.CAP_PROP_POS_FRAMES, current_frame)
         # read in frames
         _, image = cap.read()
         if image is None:
             break
+        # Retrieve the current frame timestamp
+        #print(cap.get(cv.CAP_PROP_POS_FRAMES))
         cv.rectangle(image, (25, 15), (230, 180), (0, 0, 0), -1)
-        cv.putText(image, str(current_frame), (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, \
-                          (0, 255, 0), 2, cv.LINE_AA)
+        cv.putText(image, str(current_frame), (50, 50), 
+                   cv.FONT_HERSHEY_SIMPLEX, 1,
+                   (0, 255, 0), 2, cv.LINE_AA)
         i = 0
         for string in str_arr:
             cv.putText(image, string, (50, 75+i*15), cv.FONT_HERSHEY_SIMPLEX, 0.4, \
                           (0, 255, 255), 1, cv.LINE_AA) 
             i += 1
-
         # Display the current frame
         cv.imshow("Video", image)
 
         key = cv.waitKey(1)
+        print("Current: ", current_frame)
+        print("Actual: ", cap.get(cv.CAP_PROP_POS_FRAMES))
         # Handle key presses
         if key == ord("."):
             current_frame += 1  # Move to the next frame
-            counter += 1
         elif key == ord(","):
             current_frame -= 1  # Move to the previous frame
-            counter -= 1
         elif key == ord("s"):
             break
         elif key == ord("r"):
             current_frame = 0
-            counter = 0
         elif key == ord("-"):
             current_frame -= 20
-            counter -= 20
         elif key == ord("="):
             current_frame += 20
-            counter += 20
-
-        # Set the frame position in the video
-        cap.set(cv.CAP_PROP_POS_FRAMES, current_frame)
 
     cap.release()
     cv.destroyAllWindows()
-    return counter
+    return current_frame
 
 if __name__ == "__main__":
     print(get_release_frame(video_path(cfg.fileConfig.pitch1_name, 

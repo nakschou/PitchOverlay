@@ -33,9 +33,7 @@ def get_boxes(model, vid_path: str) -> dict:
     if not os.path.isfile(vid_path):
         raise ValueError("Invalid path")
     cap = cv.VideoCapture(vid_path)
-    length = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
     boxes_dct = {}
-    counter = 0
     while cap.isOpened():
         # read in frames
         _, image = cap.read()
@@ -54,9 +52,9 @@ def get_boxes(model, vid_path: str) -> dict:
                 coords_w_conf[j] = results[0].boxes.xyxy[i][j]
             coords_w_conf[confidence_ind] = results[0].boxes.conf[i].item()
             coords_w_conf[-1] = int(i+1)
-            dct_key = (counter + 0.01*i)
+            count = cap.get(cv.CAP_PROP_POS_FRAMES)
+            dct_key = (count + 0.01*i)
             boxes_dct[dct_key] = coords_w_conf
-        counter += 1
         if cv.waitKey(1) == ord("q"):
             break
     cap.release()
