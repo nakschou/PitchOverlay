@@ -94,59 +94,6 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
     cv.destroyAllWindows()
     return circles_dct
 
-'''
-def get_mask(dct: dict, vid_path: str, out_path: str) -> None:
-    """
-    Creates a video with circles around the detected balls.
-
-    Args:
-        dct (dict): Dictionary containing circle data.
-        vid_path (str): Path to video.
-        out_path (str): Path to save video.
-    
-    Returns:
-        None
-    
-    Raises:
-        ValueError: If vid_path is not a valid path.
-    """
-    if not os.path.isfile(path):
-        raise ValueError("Invalid path")
-    cap = cv.VideoCapture(vid_path)
-    length = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
-    framerate = int(cap.get(cv.CAP_PROP_FPS))
-    #specifies the codec and creates a video writer object
-    fourcc = cv.VideoWriter_fourcc(*'mp4v')
-    out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap.get(3)), \
-                                                       int(cap.get(4))))
-    avg_radius = int(np.mean([i[2] for i in dct.values()]))
-    for i in range(length):
-        ret, frame = cap.read()
-        if ret == True:
-            if i in dct.keys():
-                mask = np.zeros((int(cap.get(4)), int(cap.get(3)), 3), np.uint8)
-                x, y = dct[i][0], dct[i][1]
-                # Define the circle
-                center = (x, y)
-                radius = avg_radius
-                color = (255, 255, 255)
-
-                # Draw the defined circle on the mask
-                cv.circle(mask, center, radius, color, -1)
-
-                # Apply the mask to the original image
-                result = cv.bitwise_and(frame, mask)
-                out.write(result)
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            break
-    cap.release()
-    # Release the video writer object
-    out.release()
-    cv.destroyAllWindows()
-'''
-
 def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
     """
     Runs the vision processing pipeline.

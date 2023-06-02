@@ -4,7 +4,7 @@ class fileConfig:
     pitch1_velo = 98 #Velocity of the first pitch
     #Try and find this, otherwise set to a negative number
     #to have the program find it for you (it will not be 100% accurate)
-    release1_frame = 180
+    release1_frame = 180 
     pitch2_name = "colekc1" #Name of the file of the second pitch, without .mp4
     pitch2_velo = 86 #Velocity of the second pitch
     release2_frame = 182
