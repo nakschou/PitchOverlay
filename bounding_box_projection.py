@@ -261,6 +261,26 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     df.reset_index(inplace=True)
     return df
 
+def boxes_adjustment(df: pd.DataFrame, vid_path: str, pixel: np.array) -> pd.DataFrame:
+    """
+    Given a dataframe with rough bounding boxes, applies computer vision
+    techniques to try to recenter the boxes based on color detection of the
+    baseballs.
+
+    Args:
+        df (DataFrame): Dataframe containing bounding box data
+        vid_path (str): Path to video
+    
+    Returns:
+        DataFrame: DataFrame with the bounding boxes fixed
+    
+    Raises:
+        ValueError: If vid_path is not a valid path
+    """
+    if not os.path.isfile(vid_path):
+        raise ValueError("Invalid path")
+    
+
 
 def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     """
@@ -277,7 +297,7 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     Raises:
         ValueError: If vid_path is not a valid path.
     """
-    if not os.path.isfile(path):
+    if not os.path.isfile(vid_path):
         raise ValueError("Invalid path")
     cap = cv.VideoCapture(vid_path)
     framerate = int(cap.get(cv.CAP_PROP_FPS))
