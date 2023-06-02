@@ -61,8 +61,8 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
                     # Get the pixel values at (x, y)
                     pixel = hsv[y_center, x_center]
         
-                    lower = pixel - np.array([360, 360, 360])
-                    upper = pixel + np.array([360, 10, 360])
+                    lower = pixel - cfg.fileConfig.pixel_low_thres
+                    upper = pixel + cfg.fileConfig.pixel_high_thres
                 
                     # preparing the mask to overlay
                     mask2 = cv.inRange(hsv, lower, upper)
