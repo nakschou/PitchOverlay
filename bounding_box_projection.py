@@ -90,7 +90,7 @@ def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame, start_frame: int) -> \
             curr_detections += frame_arr[i]
         max_detections = curr_detections
         max_detections_i = 0
-        #finds the maximum number of detections in a window, if there are multiple
+        #finds the max number of detections in a window, if there are multiple
         #windows with the same number of detections, it takes the middle one  
         for i in range(1, vid_data[1]-window):
             curr_detections -= frame_arr[i-1]
