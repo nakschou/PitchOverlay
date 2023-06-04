@@ -1,0 +1,46 @@
+[2023-06-02 15:46:59] INFO - super_gradients.common.crash_handler.crash_tips_setup - Crash tips is enabled. You can set your environment variable to CRASH_HANDLER=FALSE to disable it
+[2023-06-02 15:47:00] DEBUG - matplotlib - matplotlib data path: C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\matplotlib\mpl-data
+[2023-06-02 15:47:00] DEBUG - matplotlib - CONFIGDIR=C:\Users\Home\.matplotlib
+[2023-06-02 15:47:00] DEBUG - matplotlib - interactive is False
+[2023-06-02 15:47:00] DEBUG - matplotlib - platform is win32
+[2023-06-02 15:47:00] DEBUG - matplotlib - CACHEDIR=C:\Users\Home\.matplotlib
+[2023-06-02 15:47:00] DEBUG - matplotlib.font_manager - Using fontManager instance from C:\Users\Home\.matplotlib\fontlist-v330.json
+[2023-06-02 15:47:01] WARNING - torch.distributed.elastic.multiprocessing.redirects - NOTE: Redirects are currently not supported in Windows or MacOs.
+[2023-06-02 15:47:01] DEBUG - super_gradients.common.registry.albumentation - Failed to import albumentations
+[2023-06-02 15:47:02] DEBUG - pip._internal.vcs.versioncontrol - Registered VCS backend: bzr
+[2023-06-02 15:47:02] DEBUG - pip._internal.vcs.versioncontrol - Registered VCS backend: git
+[2023-06-02 15:47:02] DEBUG - pip._internal.vcs.versioncontrol - Registered VCS backend: hg
+[2023-06-02 15:47:02] DEBUG - pip._internal.vcs.versioncontrol - Registered VCS backend: svn
+[2023-06-02 15:47:02] DEBUG - super_gradients.common.sg_loggers.clearml_sg_logger - Failed to import clearml
+[2023-06-02 15:47:02] DEBUG - super_gradients.modules - Failed to import pytorch_quantization: cannot import name 'Bottleneck' from partially initialized module 'super_gradients.training.models.classification_models.resnet' (most likely due to a circular import) (C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\models\classification_models\resnet.py)
+[2023-06-02 15:47:02] DEBUG - hydra.core.utils - Setting JobRuntime:name=UNKNOWN_NAME
+[2023-06-02 15:47:02] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:02] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:03] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:03] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:03] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:03] WARNING - super_gradients.training.utils.quantization - Failed to import pytorch_quantization
+[2023-06-02 15:47:03] WARNING - super_gradients.training.utils.quantization.calibrator - Failed to import pytorch_quantization
+[2023-06-02 15:47:03] WARNING - super_gradients.training.utils.quantization.export - Failed to import pytorch_quantization
+[2023-06-02 15:47:03] WARNING - super_gradients.training.utils.quantization.selective_quantization_utils - Failed to import pytorch_quantization
+[2023-06-02 15:47:03] DEBUG - super_gradients.training.qat_trainer.qat_trainer - Failed to import pytorch_quantization:
+[2023-06-02 15:47:03] DEBUG - super_gradients.training.qat_trainer.qat_trainer - name 'QuantizedMetadata' is not defined
+[2023-06-02 15:47:03] WARNING - super_gradients.sanity_check.env_sanity_check - [31mFailed to verify operating system: Deci officially supports only Linux kernels. Some features may not work as expected.[0m
+[2023-06-02 15:47:03] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:05] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:05] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:05] DEBUG - hydra.core.utils - Setting JobRuntime:name=app
+[2023-06-02 15:47:06] INFO - super_gradients.training.utils.checkpoint_utils - License Notification: YOLO-NAS pre-trained weights are subjected to the specific license terms and conditions detailed in 
+https://github.com/Deci-AI/super-gradients/blob/master/LICENSE.YOLONAS.md
+By downloading the pre-trained weight files you agree to comply with these terms.
+[2023-06-02 15:47:06] INFO - super_gradients.training.sg_trainer.sg_trainer - Using EMA with params {'decay': 0.9, 'decay_type': 'threshold'}
+[2023-06-02 15:47:06] DEBUG - super_gradients.training.utils.sg_trainer_utils - "events.out.tfevents.1685744868.LAPTOP-UPDFSVIH.21452.0" will not be deleted
+[2023-06-02 15:47:07] ERROR - super_gradients.training.sg_trainer.sg_trainer - Uncaught exception
+Traceback (most recent call last):
+  File "C:\Users\Home\Desktop\OpenCV2023\yolonas_training.py", line 127, in <module>
+    trainer.train(model=model,
+  File "C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\sg_trainer\sg_trainer.py", line 1165, in train
+    self._initialize_mixed_precision(self.training_params.mixed_precision)
+  File "C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\sg_trainer\sg_trainer.py", line 1381, in _initialize_mixed_precision
+    assert device_config.device.startswith("cuda"), "mixed precision is not available for CPU"
+AssertionError: mixed precision is not available for CPU

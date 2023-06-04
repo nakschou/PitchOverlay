@@ -68,7 +68,7 @@ def get_release_frame(vid_path: str) -> int:
         vid_path (str): Path to the video
     
     Returns:
-        int: Release frame
+        tuple (int, tuple): release frame, pixel location
     """
     cap = cv.VideoCapture(vid_path)
     framerate = int(cap.get(cv.CAP_PROP_FPS))
@@ -83,12 +83,12 @@ def get_release_frame(vid_path: str) -> int:
     while cap.isOpened():
         # Set the frame position in the video
         cap.set(cv.CAP_PROP_POS_FRAMES, current_frame)
-        # read in frames
+        # Read in frames
         _, image = cap.read()
         if image is None:
             break
         # Retrieve the current frame timestamp
-        #print(cap.get(cv.CAP_PROP_POS_FRAMES))
+        # print(cap.get(cv.CAP_PROP_POS_FRAMES))
         cv.rectangle(image, (25, 15), (230, 180), (0, 0, 0), -1)
         cv.putText(image, str(current_frame), (50, 50), 
                    cv.FONT_HERSHEY_SIMPLEX, 1,
@@ -102,14 +102,25 @@ def get_release_frame(vid_path: str) -> int:
         cv.imshow("Video", image)
 
         key = cv.waitKey(1)
-        print("Current: ", current_frame)
-        print("Actual: ", cap.get(cv.CAP_PROP_POS_FRAMES))
         # Handle key presses
         if key == ord("."):
             current_frame += 1  # Move to the next frame
         elif key == ord(","):
             current_frame -= 1  # Move to the previous frame
         elif key == ord("s"):
+            # Save color of a clicked pixel
+            clicked_pixel_color = None
+            pixel_loc = None
+
+            def mouse_callback(event, x, y, flags, param):
+                nonlocal pixel_loc
+                if event == cv.EVENT_LBUTTONDOWN:
+                    pixel_loc = (x,y)
+
+            cv.setMouseCallback("Video", mouse_callback)
+
+            while pixel_loc is None:
+                cv.waitKey(1)
             break
         elif key == ord("r"):
             current_frame = 0
@@ -120,7 +131,7 @@ def get_release_frame(vid_path: str) -> int:
 
     cap.release()
     cv.destroyAllWindows()
-    return current_frame
+    return (current_frame, pixel_loc)
 
 if __name__ == "__main__":
     print(get_release_frame(video_path(cfg.fileConfig.pitch1_name, 

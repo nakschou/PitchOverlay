@@ -1,0 +1,44 @@
+============================================================
+New run started at 2023-06-02.15:57:15.426456
+sys.argv: "yolonas_training.py"
+============================================================
+The console stream is logged into C:\Users\Home\sg_logs\console.log
+
+Caching annotations:   0%|                                                                                                                             | 0/3418 [00:00<?, ?it/s]
+Caching annotations:  10%|███████████▏                                                                                                     | 338/3418 [00:00<00:00, 3373.17it/s]
+Caching annotations:  20%|██████████████████████▊                                                                                          | 690/3418 [00:00<00:00, 3449.83it/s]
+Caching annotations:  31%|██████████████████████████████████▌                                                                             | 1054/3418 [00:00<00:00, 3524.09it/s]
+Caching annotations:  42%|██████████████████████████████████████████████▌                                                                 | 1422/3418 [00:00<00:00, 3571.73it/s]
+Caching annotations:  52%|██████████████████████████████████████████████████████████▎                                                     | 1780/3418 [00:00<00:00, 3512.87it/s]
+Caching annotations:  62%|█████████████████████████████████████████████████████████████████████▊                                          | 2132/3418 [00:00<00:00, 3479.03it/s]
+Caching annotations:  73%|█████████████████████████████████████████████████████████████████████████████████▋                              | 2493/3418 [00:00<00:00, 3516.80it/s]
+Caching annotations:  83%|█████████████████████████████████████████████████████████████████████████████████████████████▏                  | 2845/3418 [00:00<00:00, 3495.53it/s]
+Caching annotations:  94%|█████████████████████████████████████████████████████████████████████████████████████████████████████████       | 3207/3418 [00:00<00:00, 3523.22it/s]
+Caching annotations: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3418/3418 [00:00<00:00, 3511.69it/s]
+
+Caching annotations:   0%|                                                                                                                              | 0/487 [00:00<?, ?it/s]
+Caching annotations:  73%|██████████████████████████████████████████████████████████████████████████████████▊                               | 354/487 [00:00<00:00, 3507.99it/s]
+Caching annotations: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 487/487 [00:00<00:00, 3519.84it/s]
+
+Caching annotations:   0%|                                                                                                                              | 0/248 [00:00<?, ?it/s]
+Caching annotations: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 248/248 [00:00<00:00, 3132.83it/s]
+The console stream is now moved to yolonas_checkpoints\baseball_detection/console_Jun02_15_57_21.txt
+C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\torch\cuda\amp\grad_scaler.py:118: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  warnings.warn("torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.")
+[2023-06-02 15:57:21] ERROR - sg_trainer_utils.py - Uncaught exception
+Traceback (most recent call last):
+  File "C:\Users\Home\Desktop\OpenCV2023\yolonas_training.py", line 127, in <module>
+    trainer.train(model=model,
+  File "C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\sg_trainer\sg_trainer.py", line 1165, in train
+    self._initialize_mixed_precision(self.training_params.mixed_precision)
+  File "C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\sg_trainer\sg_trainer.py", line 1381, in _initialize_mixed_precision
+    assert device_config.device.startswith("cuda"), "mixed precision is not available for CPU"
+AssertionError: mixed precision is not available for CPU
+Traceback (most recent call last):
+  File "C:\Users\Home\Desktop\OpenCV2023\yolonas_training.py", line 127, in <module>
+    trainer.train(model=model, 
+  File "C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\sg_trainer\sg_trainer.py", line 1165, in train
+    self._initialize_mixed_precision(self.training_params.mixed_precision)
+  File "C:\Users\Home\anaconda3\envs\opencv2023\lib\site-packages\super_gradients\training\sg_trainer\sg_trainer.py", line 1381, in _initialize_mixed_precision
+    assert device_config.device.startswith("cuda"), "mixed precision is not available for CPU"
+AssertionError: mixed precision is not available for CPU

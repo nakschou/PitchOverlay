@@ -1,7 +1,7 @@
 import cv2 as cv
 import os
 
-vid_path = 'pitcher_vids/cut up/cutup.mp4'
+vid_path = 'pitcher_vids/cut up/cutup2.mp4'
 seq_path = 'sequence/'
 
 def create_sequence(vid_path: str, seq_path: str) -> None:

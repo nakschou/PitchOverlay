@@ -240,7 +240,6 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
         framearr[i-toi[0]] = 1
     missing_rows = {}
     for i in range(toi[1] - toi[0]):
-        print("curr frame: ", i+toi[0])
         if(framearr[i] == 0):
             missing_rows[i+toi[0]] = [0, 0, 0, 0, 
                                       np.polyval(x_parametric, i+toi[0]),
@@ -260,27 +259,6 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     df.sort_values(by=['frame'], inplace=True)
     df.reset_index(inplace=True)
     return df
-
-def boxes_adjustment(df: pd.DataFrame, vid_path: str, pixel: np.array) -> pd.DataFrame:
-    """
-    Given a dataframe with rough bounding boxes, applies computer vision
-    techniques to try to recenter the boxes based on color detection of the
-    baseballs.
-
-    Args:
-        df (DataFrame): Dataframe containing bounding box data
-        vid_path (str): Path to video
-    
-    Returns:
-        DataFrame: DataFrame with the bounding boxes fixed
-    
-    Raises:
-        ValueError: If vid_path is not a valid path
-    """
-    if not os.path.isfile(vid_path):
-        raise ValueError("Invalid path")
-    
-
 
 def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     """
@@ -318,12 +296,6 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
                 y2 = int(row['y2'].iloc[0])
                 cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             # Write the modified frame to the output video
-            str2 = cap.get(cv.CAP_PROP_POS_MSEC)
-            cv.putText(frame, str(curr_frame), (50, 50), 
-                       cv.FONT_HERSHEY_SIMPLEX, 1,
-                          (0, 255, 0), 2, cv.LINE_AA)
-            cv.putText(frame, str(str2), (50, 100), cv.FONT_HERSHEY_SIMPLEX, 
-                       1, (0, 255, 0), 2, cv.LINE_AA)
             out.write(frame) 
             cv.imshow('frame', frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
@@ -334,6 +306,42 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     # Release the video writer object
     out.release() 
     cv.destroyAllWindows()
+
+def add_pixel(df: pd.DataFrame, pixel: tuple, frame: int) -> pd.DataFrame:
+    """
+    Adds the pixel to the dataframe.
+
+    Args:
+        df (DataFrame): Dataframe containing bounding box data.
+        pixel (tuple): Tuple containing the pixel values.
+    
+    Returns:
+        DataFrame: Dataframe with pixel values added.
+    """
+    if frame not in df['frame'].values:
+        x1 = pixel[0] - cfg.fileConfig.box_size/2
+        y1 = pixel[1] - cfg.fileConfig.box_size/2
+        x2 = pixel[0] + cfg.fileConfig.box_size/2
+        y2 = pixel[1] + cfg.fileConfig.box_size/2
+        x_center = pixel[0]
+        y_center = pixel[1]
+        new_row = {'index': len(df),
+                   'frame': frame,
+                   'x1': x1,
+                   'y1': y1,
+                   'x2': x2,
+                   'y2': y2,
+                   'x_center': x_center,
+                   'y_center': y_center}
+        df = df.append(new_row, ignore_index=True)
+        df = df.sort_values(by=['frame'])
+        df = df.reset_index()
+        return df
+    #add a row to the dataframe with the pixel values
+    target_row = df[df['frame'] == frame].index
+    df.loc[target_row, 'x_center'] = pixel[0]
+    df.loc[target_row, 'y_center'] = pixel[1]
+    return df
 
 def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int, 
                new_boxes_path: str) -> None:
@@ -357,13 +365,16 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     df = add_center(df)
     vid_data = read_video_data(path)
     if(cfg.fileConfig.release1_frame < 0):
-        start_frame = ut.get_release_frame(vid_path)
+        tup = ut.get_release_frame(vid_path)
+        start_frame = tup[0]
+        pixel = tup[1]
     else:
-        start_frame = cfg.fileConfig.release1_frame
+        start_frame = cfg.fileConfig.release1_frame 
     #print(start_frame)
     toi = get_toi(vid_data, pitch_velo, df, start_frame)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df = eliminate_outliers(df)
+    print(df)
     df = normalize_boxes(df, toi)
     video_with_boxes(df, path, out_path)
     df.to_csv(new_boxes_path, index=False)
