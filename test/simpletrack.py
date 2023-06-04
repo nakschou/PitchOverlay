@@ -11,5 +11,4 @@ vid_path = ut.video_path("pitch (40)",
                                  cfg.fileConfig.pitcher_vids_path)
 
 model = YOLO(model_path)
-# Tracks the video and saves it TODO: eliminate need for this
 model.track(vid_path, save=True, conf=0.03)
