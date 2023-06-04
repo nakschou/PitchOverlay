@@ -45,9 +45,12 @@ if __name__ == "__main__":
         pixel = tup[1]
     else:
         start2_frame = cfg.fileConfig.release2_frame 
+        # Sets the timeframe of interest
+    toi1 = (start1_frame, start1_frame + ut.pitch_time_frames(pitch1_velo))
+    toi2 = (start2_frame, start2_frame + ut.pitch_time_frames(pitch2_velo)) 
     # Gets the boxes in a format unfit for a dataframe
-    boxes_dct = pred.get_boxes(model, vid1_path)
-    boxes_dct2 = pred.get_boxes(model, vid2_path)
+    boxes_dct = pred.get_boxes(model, vid1_path, toi1)
+    boxes_dct2 = pred.get_boxes(model, vid2_path, toi2)
     # Converts the boxes to fittable format and writes to dataframe
     df = pred.convert_boxes_df(boxes_dct)
     df2 = pred.convert_boxes_df(boxes_dct2)
@@ -57,9 +60,6 @@ if __name__ == "__main__":
     # Reads video data
     vid_data = bbp.read_video_data(vid1_path)
     vid2_data = bbp.read_video_data(vid2_path)
-    # Sets the timeframe of interest
-    toi1 = bbp.get_toi(vid_data, pitch1_velo, df, start1_frame)
-    toi2 = bbp.get_toi(vid_data, pitch2_velo, df, start2_frame)
     #shrinks the dataframe to the time of interest
     df = df[(df['frame'] >= toi1[0]) & (df['frame'] <= toi1[1])]
     df = bbp.eliminate_outliers(df)

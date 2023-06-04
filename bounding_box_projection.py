@@ -21,32 +21,6 @@ pitch_velo = cfg.fileConfig.pitch1_velo
 start_frame = cfg.fileConfig.release1_frame
 poly_deg = cfg.fileConfig.poly_deg
 
-def pitch_time_frames(speed: int) -> int:
-    # Convert mph to m/s
-    v0 = speed * 0.44704
-    # Adjust for release angle
-    v0 = v0 * math.cos(math.radians(math.pi/36))
-
-    # Constants
-    c_d = 0.47      # Drag coefficient of a sphere
-    a = 0.004145    # Cross-sectional area of a baseball (m^2)
-    m = 0.145       # Mass of a baseball (kg)
-    rho = 1.225     # Density of air at room temperature (kg/m^3)
-    dist = 18.44 + 1.28 # Distance from pitcher to plate (m)
-    # the weirdo number is to account for the fact that the catcher generally
-    # catches the ball a little bit behind the plate
-
-    # Calculate the drag force
-    f_d = 0.5 * c_d * a * rho * v0**2
-
-    # Calculate the acceleration due to air resistance
-    a_D = f_d / m
-
-    # Calculate the time to reach the plate
-    t = (-v0 + math.sqrt(v0**2 + 2*a_D*dist)) / a_D
-
-    return int(t*60+0.5)
-
 def read_video_data(path: str) -> tuple:
     """
     Gets the framerate and length of a video.
@@ -83,6 +57,8 @@ def add_center(df: pd.DataFrame) -> pd.DataFrame:
     df['y_center'] = (df['y1'] + df['y2']) / 2
     return df
 
+#Some unused functionality that could be useful in the future if I want
+#to completely avoid user input
 def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame, start_frame: int) -> \
     tuple:
     """
@@ -103,7 +79,7 @@ def get_toi(vid_data: tuple, velo: int, df: pd.DataFrame, start_frame: int) -> \
     Raises:
         ValueError: If toi is longer than the video.
     """
-    window = pitch_time_frames(velo)
+    window = ut.pitch_time_frames(velo)
     if window > vid_data[1]:
         raise ValueError("Desired timeframe is longer than video")
     if(start_frame < 0):

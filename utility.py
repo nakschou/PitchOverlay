@@ -1,5 +1,6 @@
 import cv2 as cv
 import config as cfg
+import math
 
 def video_path(name: str, path: str) -> str:
     """
@@ -137,6 +138,40 @@ def get_release_frame(vid_path: str) -> int:
     
     return (current_frame, pixel_loc)
 
+def pitch_time_frames(speed: int) -> int:
+    """
+    Calculates the time it takes for a pitch to reach the plate.
+
+    Args:
+        speed: The speed of the pitch in mph
+    
+    Returns:
+        The time it takes for the pitch to reach the plate in frames
+    """
+    # Convert mph to m/s
+    v0 = speed * 0.44704
+    # Adjust for release angle
+    v0 = v0 * math.cos(math.radians(math.pi/36))
+
+    # Constants
+    c_d = 0.47      # Drag coefficient of a sphere
+    a = 0.004145    # Cross-sectional area of a baseball (m^2)
+    m = 0.145       # Mass of a baseball (kg)
+    rho = 1.225     # Density of air at room temperature (kg/m^3)
+    dist = 18.44 + 1.28 # Distance from pitcher to plate (m)
+    # the weirdo number is to account for the fact that the catcher generally
+    # catches the ball a little bit behind the plate
+
+    # Calculate the drag force
+    f_d = 0.5 * c_d * a * rho * v0**2
+
+    # Calculate the acceleration due to air resistance
+    a_D = f_d / m
+
+    # Calculate the time to reach the plate
+    t = (-v0 + math.sqrt(v0**2 + 2*a_D*dist)) / a_D
+
+    return int(t*60+0.5)
 
 if __name__ == "__main__":
     print(get_release_frame(video_path(cfg.fileConfig.pitch1_name, 
