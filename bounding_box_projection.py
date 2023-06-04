@@ -234,31 +234,25 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     #new parametric equations
     x_parametric = np.polyfit(df['frame'], df['x_center'], poly_deg)
     y_parametric = np.polyfit(df['frame'], df['y_center'], poly_deg)
-    #adds the new boxes
-    framearr = np.zeros(toi[1]-toi[0]+1)
-    for i in df['frame']:
-        framearr[i-toi[0]] = 1
-    missing_rows = {}
+    newdf = {}
     for i in range(toi[1] - toi[0]):
-        if(framearr[i] == 0):
-            missing_rows[i+toi[0]] = [0, 0, 0, 0, 
-                                      np.polyval(x_parametric, i+toi[0]),
-                                      np.polyval(y_parametric, i+toi[0])]
+        newdf[i+toi[0]] = [0, 0, 0, 0, 
+                                np.polyval(x_parametric, i+toi[0]),
+                                np.polyval(y_parametric, i+toi[0])]
     #print(missing_rows)
-    missing_df = pd.DataFrame.from_dict(missing_rows, orient='index', \
+    newdf = pd.DataFrame.from_dict(newdf, orient='index', \
                                         columns=['x1', 'y1', 'x2',\
                                 'y2', 'x_center', 'y_center'])
-    missing_df.index.name = 'frame'
-    missing_df.reset_index(inplace=True)
-    df = pd.concat([df, missing_df], ignore_index=True)
+    newdf.index.name = 'frame'
+    newdf.reset_index(inplace=True)
     #sets new box xyxy values
-    df['x1'] = df['x_center'] - newxsize/2
-    df['x2'] = df['x_center'] + newxsize/2
-    df['y1'] = df['y_center'] - newysize/2
-    df['y2'] = df['y_center'] + newysize/2
-    df.sort_values(by=['frame'], inplace=True)
-    df.reset_index(inplace=True)
-    return df
+    newdf['x1'] = newdf['x_center'] - newxsize/2
+    newdf['x2'] = newdf['x_center'] + newxsize/2
+    newdf['y1'] = newdf['y_center'] - newysize/2
+    newdf['y2'] = newdf['y_center'] + newysize/2
+    newdf.sort_values(by=['frame'], inplace=True)
+    newdf.reset_index(inplace=True)
+    return newdf
 
 def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     """

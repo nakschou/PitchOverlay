@@ -12,6 +12,9 @@ class fileConfig:
     pitch2_name = "pitch (40)" #Name of the file of the second pitch, without .mp4
     pitch2_velo = 98 #Velocity of the second pitch
     release2_frame = -1
+    line_hold_time = 0.5 #Time to hold the line on the screen
+    tracers = True #Whether or not to draw tracers
+    tracerthick = 2 #Thickness of the tracers
 
     #Paths and suffixes --------------------------------------
     processed_vids_path = "processed_vids/"
@@ -28,12 +31,4 @@ class fileConfig:
     pixel_low_thres = np.array([360, 255, 255])
     pixel_high_thres = np.array([360, 10, 255])
     box_size = 12
-
-    @classmethod
-    def set_release1_frame(this, frame):
-        fileConfig.release1_frame = frame
-    
-    @classmethod
-    def set_release2_frame(this, frame):
-        fileConfig.release2_frame = frame
     
