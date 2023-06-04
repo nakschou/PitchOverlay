@@ -5,8 +5,7 @@ This is a project created with the intention of overlaying pitches from baseball
 
 ## Setup:
 1. Git clone the repo ```git clone https://github.com/nakschou/OpenCV2023.git```
-2. Navigate into the folder you cloned it as, and create your conda environment. ```conda env create -f environment.yml```. This may take some time.
-3. Activate your conda environment by typing ```conda activate opencv2023```
+2. Navigate into the folder you cloned it as, and create your virtual environment. ```pip install -r requirements.txt```. This may take some time.
 
 ## How to Use:
 1. Begin by going into your config and setting necessary parameters. They're all explained in there, somewhere (I hope).
