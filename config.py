@@ -4,12 +4,12 @@ class fileConfig:
 
     # Please set these before using --------------------------------
     final_file_name = "coleoverlay" #Name of the final file, without .mp4
-    pitch1_name = "colekc1" #Name of the file of the first pitch, without .mp4
+    pitch1_name = "pitch (41)" #Name of the file of the first pitch, without .mp4
     pitch1_velo = 86 #Velocity of the first pitch
     #Try and find this, otherwise set to a negative number
     #to have the program find it for you (it will not be 100% accurate)
     release1_frame = -1 
-    pitch2_name = "colefb1" #Name of the file of the second pitch, without .mp4
+    pitch2_name = "pitch (40)" #Name of the file of the second pitch, without .mp4
     pitch2_velo = 98 #Velocity of the second pitch
     release2_frame = -1
 
@@ -28,4 +28,12 @@ class fileConfig:
     pixel_low_thres = np.array([360, 255, 255])
     pixel_high_thres = np.array([360, 10, 255])
     box_size = 12
+
+    @classmethod
+    def set_release1_frame(this, frame):
+        fileConfig.release1_frame = frame
+    
+    @classmethod
+    def set_release2_frame(this, frame):
+        fileConfig.release2_frame = frame
     

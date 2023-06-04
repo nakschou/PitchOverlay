@@ -179,8 +179,8 @@ def eliminate_outliers(df: pd.DataFrame) -> pd.DataFrame:
                                                   x_parametric), axis=1)
     df['y_dist'] = df.apply(lambda row: dist(row['y_center'], row['frame'], \
                                                     y_parametric), axis=1)
-    df = df[abs(df['x_dist']) < 10]
-    df = df[abs(df['y_dist']) < 10]
+    df = df[abs(df['x_dist']) < 20]
+    df = df[abs(df['y_dist']) < 20]
     #removes unnecessary columns
     df = df.drop('x_dist', axis=1)
     df = df.drop('y_dist', axis=1)
@@ -343,7 +343,7 @@ def add_pixel(df: pd.DataFrame, pixel: tuple, frame: int) -> pd.DataFrame:
     df.loc[target_row, 'y_center'] = pixel[1]
     return df
 
-def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int, 
+def this_runner(boxes_path: str, vid_path: str, pitch_velo: int, 
                new_boxes_path: str) -> None:
     """
     Runner for the bounding box projection.
@@ -363,7 +363,7 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     """
     df = pd.read_csv(boxes_path)
     df = add_center(df)
-    vid_data = read_video_data(path)
+    vid_data = read_video_data(vid_path)
     if(cfg.fileConfig.release1_frame < 0):
         tup = ut.get_release_frame(vid_path)
         start_frame = tup[0]
@@ -374,11 +374,11 @@ def bbp_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     toi = get_toi(vid_data, pitch_velo, df, start_frame)
     df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
     df = eliminate_outliers(df)
-    print(df)
+    #print(df)
     df = normalize_boxes(df, toi)
     video_with_boxes(df, path, out_path)
     df.to_csv(new_boxes_path, index=False)
     
 if __name__ == "__main__":
-    bbp_runner(boxes_path, path, pitch_velo, new_boxes_path)
+    this_runner(boxes_path, path, pitch_velo, new_boxes_path)
     

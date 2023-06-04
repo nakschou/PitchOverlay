@@ -15,17 +15,16 @@ out_path = ut.video_path_suffix(cfg.fileConfig.pitch1_name,
                                  cfg.fileConfig.masks_suffix)
 poly_deg = cfg.fileConfig.poly_deg
 
-def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
+def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> None:
     """
-    Creates a video with circles around the detected balls, then takes those
-    circles and adds them to a dataframe.
+    Creates a video with circles around the detected balls.
 
     Args:
         df (DataFrame): Dataframe containing bounding box data.
         vid_path (str): Path to video.
     
     Returns:
-        dict: Dictionary containing circle data.
+        None
     
     Raises:
         ValueError: If vid_path is not a valid path.
@@ -39,7 +38,6 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
     fourcc = cv.VideoWriter_fourcc(*'mp4v')
     out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap.get(3)), \
                                                        int(cap.get(4))))
-    circles_dct = {}
     for i in range(length):
         ret, frame = cap.read()
         if ret == True:
@@ -76,12 +74,6 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
                     # Calculate data for non-zero pixels
                     mean_x = int(np.mean(non_zero_pixels[1]))
                     mean_y = int(np.mean(non_zero_pixels[0]))
-                    mean_dist = int(np.mean(np.sqrt(np.square(non_zero_pixels\
-                                        [1] - mean_x) +
-                                        np.square(non_zero_pixels[0] - 
-                                        mean_y))))
-
-                    circles_dct[i] = (mean_x, mean_y, 2*mean_dist)
                     cv.circle(frame, (mean_x, mean_y), 8, 
                               (0, 255, 0), 2)
                     out.write(result)
@@ -92,7 +84,6 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> dict:
     cap.release()
     # Release the video writer object
     cv.destroyAllWindows()
-    return circles_dct
 
 def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
     """
@@ -107,8 +98,7 @@ def vp_runner(boxes_path: str, vid_path: str, out_path: str) -> None:
         None
     """
     df = pd.read_csv(boxes_path)
-    dct = get_circles(df, vid_path, out_path)
-    #get_mask(dct, vid_path, out_path)
+    get_circles(df, vid_path, out_path)
 
 if __name__ == "__main__":
     vp_runner(boxes_path, path, out_path)

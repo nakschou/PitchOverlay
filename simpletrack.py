@@ -7,7 +7,7 @@ import utility as ut
 import os
 
 model_path = cfg.fileConfig.model_path
-vid_path = ut.video_path(cfg.fileConfig.pitch1_name,
+vid_path = ut.video_path("pitch (57)",
                                  cfg.fileConfig.pitcher_vids_path)
 
 model = YOLO(model_path)

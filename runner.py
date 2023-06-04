@@ -34,23 +34,41 @@ if __name__ == "__main__":
     # Loads the model, change pathing based on what you need
     model = YOLO(model_path)
     if(cfg.fileConfig.release1_frame < 0):
-        cfg.fileConfig.release1_frame = ut.get_release_frame(vid1_path)
+        tup = ut.get_release_frame(vid1_path)
+        start1_frame = tup[0]
+        pixel = tup[1]
+    else:
+        start1_frame = cfg.fileConfig.release1_frame 
     if(cfg.fileConfig.release2_frame < 0):
-        cfg.fileConfig.release2_frame = ut.get_release_frame(vid2_path)
+        tup = ut.get_release_frame(vid2_path)
+        start2_frame = tup[0]
+        pixel = tup[1]
+    else:
+        start2_frame = cfg.fileConfig.release2_frame 
     # Gets the boxes in a format unfit for a dataframe
     boxes_dct = pred.get_boxes(model, vid1_path)
+    boxes_dct2 = pred.get_boxes(model, vid2_path)
     # Converts the boxes to fittable format and writes to dataframe
     df = pred.convert_boxes_df(boxes_dct)
+    df2 = pred.convert_boxes_df(boxes_dct2)
     # Adds the center of the boxes to the dataframe
     df = bbp.add_center(df)
+    df2 = bbp.add_center(df2)
     # Reads video data
     vid_data = bbp.read_video_data(vid1_path)
+    vid2_data = bbp.read_video_data(vid2_path)
     # Sets the timeframe of interest
-    toi = bbp.get_toi(vid_data, pitch1_velo, df, start1_frame)
+    toi1 = bbp.get_toi(vid_data, pitch1_velo, df, start1_frame)
+    toi2 = bbp.get_toi(vid_data, pitch2_velo, df, start2_frame)
     #shrinks the dataframe to the time of interest
-    df = df[(df['frame'] >= toi[0]) & (df['frame'] <= toi[1])]
+    df = df[(df['frame'] >= toi1[0]) & (df['frame'] <= toi1[1])]
     df = bbp.eliminate_outliers(df)
-    df = bbp.normalize_boxes(df, toi)
+    df = bbp.normalize_boxes(df, toi1)
     df.to_csv(boxes_path)
-    dct = vp.get_circles(df, vid1_path, out1_path)
-    ov.overlay_video(out1_path, vid2_path, toi, final_outpath, boxes_path, boxes2_path)
+    df2 = df2[(df2['frame'] >= toi2[0]) & (df2['frame'] <= toi2[1])]
+    df2 = bbp.eliminate_outliers(df2)
+    df2 = bbp.normalize_boxes(df2, toi2)
+    df2.to_csv(boxes2_path)
+    vp.get_circles(df, vid1_path, out1_path)
+    ov.overlay_video(out1_path, vid2_path, toi1, toi2, final_outpath, 
+                     boxes_path, boxes2_path)

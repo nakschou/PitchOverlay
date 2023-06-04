@@ -82,7 +82,7 @@ def convert_boxes_df(dct: dict) -> pd.DataFrame():
     df['box_num'] = df['box_num'].astype(int)
     return df
 
-def predictor_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
+def this_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
     """
     Runner for the predictor code.
 
@@ -98,8 +98,6 @@ def predictor_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
         None
     """
     model = YOLO(model_path)
-    # Tracks the video and saves it TODO: eliminate need for this
-    #model.track(vid_path, save=True, conf=0.03)
     # Gets the boxes in a format unfit for a dataframe
     boxes_dct = get_boxes(model, vid_path)
     # Converts the boxes to fittable format and writes to dataframe
@@ -110,5 +108,5 @@ def predictor_runner(model_path: str, vid_path: str, boxes_path: str) -> None:
     df.to_csv(boxes_path, index=False)
 
 if __name__ == "__main__":
-    predictor_runner(model_path, vid_path, boxes_path)
+    this_runner(model_path, vid_path, boxes_path)
 

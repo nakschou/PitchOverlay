@@ -80,6 +80,9 @@ def get_release_frame(vid_path: str) -> int:
     string5 = "'-' -> -20 frames"
     string6 = "'=' -> +20 frames"
     str_arr = [string, string2, string3, string4, string5, string6]
+
+    pixel_loc = None  # Default value assignment
+
     while cap.isOpened():
         # Set the frame position in the video
         cap.set(cv.CAP_PROP_POS_FRAMES, current_frame)
@@ -109,9 +112,6 @@ def get_release_frame(vid_path: str) -> int:
             current_frame -= 1  # Move to the previous frame
         elif key == ord("s"):
             # Save color of a clicked pixel
-            clicked_pixel_color = None
-            pixel_loc = None
-
             def mouse_callback(event, x, y, flags, param):
                 nonlocal pixel_loc
                 if event == cv.EVENT_LBUTTONDOWN:
@@ -131,7 +131,12 @@ def get_release_frame(vid_path: str) -> int:
 
     cap.release()
     cv.destroyAllWindows()
+
+    if pixel_loc is None:
+        pixel_loc = (0, 0)  # Assign default value if no mouse click was detected
+    
     return (current_frame, pixel_loc)
+
 
 if __name__ == "__main__":
     print(get_release_frame(video_path(cfg.fileConfig.pitch1_name, 
