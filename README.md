@@ -1,7 +1,7 @@
 # Pitch Overlay 2023
 This is a project created with the intention of overlaying pitches from baseballsavant.mlb.com. Under the statcast search function, you can find short videos (<15s) of pitches from pitchers. It's best to overlay pitches from the same at-bat.
 
-https://github.com/nakschou/OpenCV2023/assets/87676813/b303d737-240f-451a-9bd5-aef2051a47bd
+![coleoverlaygif](https://github.com/nakschou/OpenCV2023/assets/87676813/8b3faff0-9720-49ea-8fa6-bc7308c7f97d)
 
 ## Setup:
 1. Git clone the repo ```git clone https://github.com/nakschou/OpenCV2023.git```
