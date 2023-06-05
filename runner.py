@@ -1,8 +1,8 @@
-import vision_processing as vp
-import bounding_box_projection as bbp
-import predictor as pred
+from processing import vision_processing as vp
+from processing import bounding_box_projection as bbp
+from processing import predictor as pred
 import pandas as pd
-import overlay as ov
+from processing import overlay as ov
 import config as cfg
 import utility as ut
 from ultralytics import YOLO
