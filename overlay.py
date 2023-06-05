@@ -4,6 +4,8 @@ import pandas as pd
 import os
 import config as cfg
 
+framerate = 60
+
 def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple, 
                   out_path: str, csv1: str, csv2: str) -> dict:
     """
@@ -20,9 +22,12 @@ def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple,
     Raises:
         ValueError: If vid_path is not a valid path.
     """
+    color1 = cfg.fileConfig.color1
+    color2 = cfg.fileConfig.color2
     if not os.path.isfile(inp1_path) or not os.path.isfile(inp2_path):
         raise ValueError("Invalid path")
-    timelength = int(cfg.fileConfig.line_hold_time*60)
+    #setup as needed
+    timelength = int(cfg.fileConfig.line_hold_time*framerate)
     tracers = cfg.fileConfig.tracers
     thick = cfg.fileConfig.tracerthick
     df = pd.read_csv(csv1)
@@ -36,6 +41,7 @@ def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple,
     fourcc = cv.VideoWriter_fourcc(*'mp4v')
     out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap2.get(3)), \
                                                        int(cap2.get(4))))
+    #tracker variables
     start1 = False
     start2 = False
     firstlines = {}
@@ -54,6 +60,7 @@ def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple,
         ret2, frame2 = cap2.read()
         if ret2 == True:
             if(start1):
+                #Set coordinates for part of the line
                 if(i-1+diff >= firstmin and tracers):
                     x1 = int(df.loc[df['frame'] == i-1+diff]\
                              ['x_center'].iloc[0])
@@ -67,24 +74,28 @@ def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple,
             else:
                 result = frame2
             if(start2):
+                #Set coordinates for part of the line
                 if(i-1 >= firstmin and tracers):
                     x1 = int(df2.loc[df2['frame'] == i-1]['x_center'].iloc[0])
                     y1 = int(df2.loc[df2['frame'] == i-1]['y_center'].iloc[0])
                     x2 = int(df2.loc[df2['frame'] == i]['x_center'].iloc[0])
                     y2 = int(df2.loc[df2['frame'] == i]['y_center'].iloc[0])
                     secondlines[i] = ((x1, y1), (x2, y2))
+            # Increment the timer if the lines are done being drawn
             if(len(firstlines) != 0 and len(secondlines) != 0 and \
                start1 == False and start2 == False):
                 counter+=1
+            #clear the lines if the time is up
             if(counter == timelength):
                 firstlines.clear()
                 secondlines.clear()
+            #draw out each of the lines
             for line in firstlines:
                 cv.line(result, firstlines[line][0], firstlines[line][1],
-                        (0, 0, 255), thick)
+                        color1, thick)
             for line in secondlines:
                 cv.line(result, secondlines[line][0], secondlines[line][1],
-                        (255, 0, 0), thick)
+                        color2, thick)
             out.write(result)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break

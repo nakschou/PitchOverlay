@@ -2,6 +2,10 @@ import cv2 as cv
 import config as cfg
 import math
 
+yellow = (0, 255, 255)
+green = (0, 255, 0)
+frame_increment = 20
+
 def video_path(name: str, path: str) -> str:
     """
     Simple function to return the path of a video given the desired
@@ -72,14 +76,13 @@ def get_release_frame(vid_path: str) -> int:
         tuple (int, tuple): release frame, pixel location
     """
     cap = cv.VideoCapture(vid_path)
-    framerate = int(cap.get(cv.CAP_PROP_FPS))
     current_frame = 0
     string = "'.' -> +1 frame"
     string2 = "',' -> -1 frame"
     string3 = "'s' -> save frame"
     string4 = "'r' -> reset to frame 0"
-    string5 = "'-' -> -20 frames"
-    string6 = "'=' -> +20 frames"
+    string5 = f"'-' -> -{frame_increment} frames"
+    string6 = f"'=' -> {frame_increment} frames"
     str_arr = [string, string2, string3, string4, string5, string6]
 
     pixel_loc = None  # Default value assignment
@@ -96,11 +99,11 @@ def get_release_frame(vid_path: str) -> int:
         cv.rectangle(image, (25, 15), (230, 180), (0, 0, 0), -1)
         cv.putText(image, str(current_frame), (50, 50), 
                    cv.FONT_HERSHEY_SIMPLEX, 1,
-                   (0, 255, 0), 2, cv.LINE_AA)
+                   green, 2, cv.LINE_AA)
         i = 0
         for string in str_arr:
             cv.putText(image, string, (50, 75+i*15), cv.FONT_HERSHEY_SIMPLEX, 0.4, \
-                          (0, 255, 255), 1, cv.LINE_AA) 
+                          yellow, 1, cv.LINE_AA) 
             i += 1
         # Display the current frame
         cv.imshow("Video", image)
@@ -126,15 +129,15 @@ def get_release_frame(vid_path: str) -> int:
         elif key == ord("r"):
             current_frame = 0
         elif key == ord("-"):
-            current_frame -= 20
+            current_frame -= frame_increment
         elif key == ord("="):
-            current_frame += 20
+            current_frame += frame_increment
 
     cap.release()
     cv.destroyAllWindows()
 
     if pixel_loc is None:
-        pixel_loc = (0, 0)  # Assign default value if no mouse click was detected
+        pixel_loc = (0, 0) # Assign default value if no mouse click was detected
     
     return (current_frame, pixel_loc)
 

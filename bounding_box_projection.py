@@ -21,6 +21,12 @@ pitch_velo = cfg.fileConfig.pitch1_velo
 start_frame = cfg.fileConfig.release1_frame
 poly_deg = cfg.fileConfig.poly_deg
 
+#magic numbers
+double_factor = 2
+width_loc = 3
+height_loc = 4
+green = (0, 255, 0)
+
 def read_video_data(path: str) -> tuple:
     """
     Gets the framerate and length of a video.
@@ -53,8 +59,8 @@ def add_center(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame: Dataframe with x_center and y_center columns added.
     """
-    df['x_center'] = (df['x1'] + df['x2']) / 2
-    df['y_center'] = (df['y1'] + df['y2']) / 2
+    df['x_center'] = (df['x1'] + df['x2']) / double_factor
+    df['y_center'] = (df['y1'] + df['y2']) / double_factor
     return df
 
 #Some unused functionality that could be useful in the future if I want
@@ -197,8 +203,10 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     Returns:
         DataFrame: Dataframe with normalized boxes.
     """
-    x_increment = 2 #make bounding box bigger by x_increment pixels
-    y_increment = 0 #make bounding box bigger by y_increment pixels
+    #make bounding box bigger by x_increment pixels
+    x_increment = cfg.fileConfig.x_increment
+    #make bounding box bigger by y_increment pixels
+    y_increment = cfg.fileConfig.y_increment
     #gets the sizes of the boxes
     df['x_size'] = (df['x2'] - df['x1'])
     df['y_size'] = (df['y2'] - df['y1'])
@@ -222,10 +230,10 @@ def normalize_boxes(df: pd.DataFrame, toi: tuple) -> pd.DataFrame:
     newdf.index.name = 'frame'
     newdf.reset_index(inplace=True)
     #sets new box xyxy values
-    newdf['x1'] = newdf['x_center'] - newxsize/2
-    newdf['x2'] = newdf['x_center'] + newxsize/2
-    newdf['y1'] = newdf['y_center'] - newysize/2
-    newdf['y2'] = newdf['y_center'] + newysize/2
+    newdf['x1'] = newdf['x_center'] - newxsize/double_factor
+    newdf['x2'] = newdf['x_center'] + newxsize/double_factor
+    newdf['y1'] = newdf['y_center'] - newysize/double_factor
+    newdf['y2'] = newdf['y_center'] + newysize/double_factor
     newdf.sort_values(by=['frame'], inplace=True)
     newdf.reset_index(inplace=True)
     return newdf
@@ -251,8 +259,8 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     framerate = int(cap.get(cv.CAP_PROP_FPS))
     #specifies the codec and creates a video writer object
     fourcc = cv.VideoWriter_fourcc(*'mp4v')
-    out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap.get(3)), \
-                                                       int(cap.get(4))))
+    out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap.get(width_loc)),
+                                                    int(cap.get(height_loc))))
     curr_frame = 0
     while cap.isOpened():
         ret, frame = cap.read()
@@ -264,7 +272,7 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
                 y1 = int(row['y1'].iloc[0])
                 x2 = int(row['x2'].iloc[0])
                 y2 = int(row['y2'].iloc[0])
-                cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv.rectangle(frame, (x1, y1), (x2, y2), green, 2)
             # Write the modified frame to the output video
             out.write(frame) 
             cv.imshow('frame', frame)
@@ -289,10 +297,10 @@ def add_pixel(df: pd.DataFrame, pixel: tuple, frame: int) -> pd.DataFrame:
         DataFrame: Dataframe with pixel values added.
     """
     if frame not in df['frame'].values:
-        x1 = pixel[0] - cfg.fileConfig.box_size/2
-        y1 = pixel[1] - cfg.fileConfig.box_size/2
-        x2 = pixel[0] + cfg.fileConfig.box_size/2
-        y2 = pixel[1] + cfg.fileConfig.box_size/2
+        x1 = pixel[0] - cfg.fileConfig.box_size/double_factor
+        y1 = pixel[1] - cfg.fileConfig.box_size/double_factor
+        x2 = pixel[0] + cfg.fileConfig.box_size/double_factor
+        y2 = pixel[1] + cfg.fileConfig.box_size/double_factor
         x_center = pixel[0]
         y_center = pixel[1]
         new_row = {'index': len(df),
@@ -336,8 +344,7 @@ def this_runner(boxes_path: str, vid_path: str, pitch_velo: int,
     vid_data = read_video_data(vid_path)
     if(cfg.fileConfig.release1_frame < 0):
         tup = ut.get_release_frame(vid_path)
-        start_frame = tup[0]
-        pixel = tup[1]
+        start_frame, pixel = tup
     else:
         start_frame = cfg.fileConfig.release1_frame 
     #print(start_frame)

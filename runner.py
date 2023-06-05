@@ -35,14 +35,12 @@ if __name__ == "__main__":
     model = YOLO(model_path)
     if(cfg.fileConfig.release1_frame < 0):
         tup = ut.get_release_frame(vid1_path)
-        start1_frame = tup[0]
-        pixel = tup[1]
+        start1_frame, pixel = tup
     else:
         start1_frame = cfg.fileConfig.release1_frame 
     if(cfg.fileConfig.release2_frame < 0):
         tup = ut.get_release_frame(vid2_path)
-        start2_frame = tup[0]
-        pixel = tup[1]
+        start2_frame, pixel = tup
     else:
         start2_frame = cfg.fileConfig.release2_frame 
         # Sets the timeframe of interest
