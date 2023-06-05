@@ -4,8 +4,6 @@ import pandas as pd
 import os
 import config as cfg
 
-framerate = 60
-
 def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple, 
                   out_path: str, csv1: str, csv2: str) -> dict:
     """
@@ -27,7 +25,6 @@ def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple,
     if not os.path.isfile(inp1_path) or not os.path.isfile(inp2_path):
         raise ValueError("Invalid path")
     #setup as needed
-    timelength = int(cfg.fileConfig.line_hold_time*framerate)
     tracers = cfg.fileConfig.tracers
     thick = cfg.fileConfig.tracerthick
     df = pd.read_csv(csv1)
@@ -37,6 +34,7 @@ def overlay_video(inp1_path: str, inp2_path: str, toi: tuple, toi2: tuple,
     lengthoverlay1 = int(cap1.get(cv.CAP_PROP_FRAME_COUNT))
     length = int(cap2.get(cv.CAP_PROP_FRAME_COUNT))
     framerate = int(cap2.get(cv.CAP_PROP_FPS))
+    timelength = int(cfg.fileConfig.line_hold_time*framerate)
     #specifies the codec and creates a video writer object
     fourcc = cv.VideoWriter_fourcc(*'mp4v')
     out = cv.VideoWriter(out_path, fourcc, framerate, (int(cap2.get(3)), \

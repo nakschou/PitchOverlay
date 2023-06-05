@@ -68,14 +68,6 @@ def get_circles(df: pd.DataFrame, vid_path: str, out_path: str) -> None:
                     combined_mask = cv.bitwise_and(mask1, mask2)
                     
                     result = cv.bitwise_and(frame, frame, mask = combined_mask)
-                    non_zero_pixels = np.where(result != 0)
-                    #print(non_zero_pixels)
-
-                    # Calculate data for non-zero pixels
-                    mean_x = int(np.mean(non_zero_pixels[1]))
-                    mean_y = int(np.mean(non_zero_pixels[0]))
-                    cv.circle(frame, (mean_x, mean_y), 8, 
-                              (0, 255, 0), 2)
                     out.write(result)
                 if cv.waitKey(1) & 0xFF == ord('q'):
                     break
