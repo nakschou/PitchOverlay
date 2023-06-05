@@ -3,14 +3,14 @@ import numpy as np
 class fileConfig:
 
     # Please set these before using --------------------------------
-    final_file_name = "coleoverlay" #Name of the final file, without .mp4
-    pitch1_name = "pitch (41)" #Name of the file of the first pitch, without .mp4
-    pitch1_velo = 86 #Velocity of the first pitch
+    final_file_name = "kershawoverlay" #Name of the final file, without .mp4
+    pitch1_name = "kershaw1" #Name of the file of the first pitch, without .mp4
+    pitch1_velo = 91 #Velocity of the first pitch
     #Try and find this, otherwise set to a negative number
     #to have the program find it for you (it will not be 100% accurate)
     release1_frame = -1 
-    pitch2_name = "pitch (40)" #Name of the file of the second pitch, without .mp4
-    pitch2_velo = 98 #Velocity of the second pitch
+    pitch2_name = "kershaw2" #Name of the file of the second pitch, without .mp4
+    pitch2_velo = 87 #Velocity of the second pitch
     release2_frame = -1
     line_hold_time = 0.5 #Time to hold the line on the screen
     tracers = True #Whether or not to draw tracers
