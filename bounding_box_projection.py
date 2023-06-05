@@ -264,22 +264,21 @@ def video_with_boxes(df: pd.DataFrame, vid_path: str, out_path: str):
     curr_frame = 0
     while cap.isOpened():
         ret, frame = cap.read()
-        if ret == True:
-            curr_frame = cap.get(cv.CAP_PROP_POS_FRAMES)
-            if curr_frame in df['frame'].values:
-                row = df.loc[df['frame'] == curr_frame]
-                x1 = int(row['x1'].iloc[0])
-                y1 = int(row['y1'].iloc[0])
-                x2 = int(row['x2'].iloc[0])
-                y2 = int(row['y2'].iloc[0])
-                cv.rectangle(frame, (x1, y1), (x2, y2), green, 2)
-            # Write the modified frame to the output video
-            out.write(frame) 
-            cv.imshow('frame', frame)
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
+        if ret == False:
             break
+        curr_frame = cap.get(cv.CAP_PROP_POS_FRAMES)
+        if curr_frame in df['frame'].values:
+            row = df.loc[df['frame'] == curr_frame]
+            x1 = int(row['x1'].iloc[0])
+            y1 = int(row['y1'].iloc[0])
+            x2 = int(row['x2'].iloc[0])
+            y2 = int(row['y2'].iloc[0])
+            cv.rectangle(frame, (x1, y1), (x2, y2), green, 2)
+            # Write the modified frame to the output video
+        out.write(frame) 
+        cv.imshow('frame', frame)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+                break
     cap.release()
     # Release the video writer object
     out.release() 
