@@ -15,3 +15,6 @@ This is a project created with the intention of overlaying pitches from baseball
 5. Let the model work its (somewhat accurate) magic.
 
 Note that this project is still in development and could result in bad detections. You can try to play with the parameters in config, but these are ultimately going to be fixed by a more robust model.
+
+For more on the process, you can check out:
+https://medium.com/@justintchou/baseball-pitch-overlays-with-yolov8-and-opencv-e80598c21e6b
